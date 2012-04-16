@@ -11,7 +11,8 @@
 #include <QTabWidget>
 #include <QPixmap>
 
-class GESPage;
+#include "GESPage.h"
+
 class Graph;
 
 class GESTabWidget: public QTabWidget {
@@ -25,7 +26,7 @@ public:
 
 	QPixmap* getViewportPixmap();
 
-
+	GESPage* getCurrentPage();
 
 public slots:
 
@@ -50,8 +51,6 @@ public slots:
 signals:
 	void scaleChanged(qreal);
 
-private:
-	GESPage* getCurrentPage();
 };
 
 #endif /* GESTABWIDGET_H_ */

@@ -38,6 +38,9 @@ public:
 	void addItems(QList<QGraphicsItem*> list);
 
 	void setGraph( Graph* gr );
+	Graph* getGraph() const{
+		return mGraph;
+	}
 
 public slots:
 	//! Установка состояния

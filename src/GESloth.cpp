@@ -8,6 +8,7 @@
 #include "HelpBrowser.h"
 #include "GESTabWidget.h"
 #include "GESFileLoader.h"
+#include "GESFileWriter.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -367,6 +368,9 @@ void GESloth::Open() {
 	QString FileName = QFileDialog::getOpenFileName(0, tr("Open graph"), "",
 			"*.grh");
 
+	if( FileName == "" )
+		return;
+
 	GESFileLoader loader;
 	Graph* graph = new Graph();
 	if( !loader.load( graph, FileName ) )
@@ -376,54 +380,23 @@ void GESloth::Open() {
 }
 
 void GESloth::Save() {
-	if (NameOfFile == "") {
+	GESPage* page = tabWidget->getCurrentPage();
+	if (page->getFileName() == "" ) {
 		SaveAs();
 		return;
 	}
-	saveToFile();
+	GESFileWriter writer;
+	writer.write( page->getScene()->getGraph(), page->getFileName() );
 }
 
 void GESloth::SaveAs() {
+	GESPage* page = tabWidget->getCurrentPage();
 	QString FileName = QFileDialog::getSaveFileName(0, tr("Save graph"), "",
 			"*.grh");
-	NameOfFile = FileName;
-	saveToFile();
-}
-
-void GESloth::openFromFile() {
-
-
-/*	QFile fileIn(NameOfFile);
-
-	if (!fileIn.open(QFile::ReadOnly | QFile::Text))
+	if( FileName == "" )
 		return;
-	if (NameOfFile == "") {
-		QMessageBox::warning(0, qAppName(),
-				tr("File open error.%1").arg(NameOfFile));
-		return;
-	}
-
-	QList<QGraphicsItem*> items;
-	QByteArray bt = fileIn.readAll();
-	fileIn.close();
-	if (!scene->openFromByte(items, bt)) {
-		QMessageBox::critical(0, tr("Error!"), tr("Error read XML-file!"),
-				QMessageBox::Close);
-	}
-	scene->deleteObj(scene->items());
-	scene->addItems(items);*/
-}
-
-void GESloth::saveToFile() {
-//	QFile fileOut(NameOfFile);
-//	if (!fileOut.open(QFile::WriteOnly | QFile::Text))
-//		return;
-//	QByteArray bt;
-//	QList<QGraphicsItem*> items;
-//	items = scene->items();
-//	scene->saveToByte(items, bt);
-//	fileOut.write(bt);
-//	fileOut.close();
+	GESFileWriter writer;
+	writer.write( page->getScene()->getGraph(), FileName );
 }
 
 void GESloth::switchLang(QAction* act) {

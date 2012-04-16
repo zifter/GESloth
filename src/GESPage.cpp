@@ -10,7 +10,7 @@
 #include "GESView.h"
 #include <QHBoxLayout>
 
-GESPage::GESPage() {
+GESPage::GESPage() : mFileName(""){
 	mScene = new GESScene();
 	mScene->setItemIndexMethod(QGraphicsScene::NoIndex);
 

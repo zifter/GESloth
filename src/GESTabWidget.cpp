@@ -6,7 +6,6 @@
  */
 
 #include "GESTabWidget.h"
-#include "GESPage.h"
 #include "GESScene.h"
 #include "GESView.h"
 
@@ -23,6 +22,7 @@ void GESTabWidget::addPage(){
 
 void GESTabWidget::addPage( QString& name, Graph* graph ){
 	GESPage* page = new GESPage( );
+	page->setFileName( name );
 	page->getScene()->setGraph( graph );
 	addTab( page, name );
 }

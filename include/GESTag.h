@@ -8,17 +8,19 @@
 #ifndef GESTAG_H_
 #define GESTAG_H_
 
+#include <QString>
+
 namespace tag {
-	QString XML_GRAPH("GRAPH");
-	QString XML_EDGE("edge");
-	QString XML_NODE("node");
+	const QString XML_GRAPH("GRAPH");
+	const QString XML_EDGE("edge");
+	const QString XML_NODE("node");
 }
 
 namespace attr {
-	QString XML_TEXT("text");
-	QString XML_ID("id");
-	QString XML_ID_SOURCE("idsource");
-	QString XML_ID_DEST("iddest");
+	const QString XML_TEXT("text");
+	const QString XML_ID("id");
+	const QString XML_ID_SOURCE("idsource");
+	const QString XML_ID_DEST("iddest");
 }
 
 #endif /* GESTAG_H_ */

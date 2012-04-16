@@ -28,6 +28,7 @@
 #include "Edge.h"
 #include "Macros.h"
 #include "GESFileLoader.h"
+#include "GESFileWriter.h"
 
 GESScene::GESScene(GESloth *prnt) :
 		Parent(prnt), line(NULL), point(NULL), menu(NULL) {
@@ -290,8 +291,11 @@ void GESScene::copyObj() {
 		}
 	}
 	QMimeData *mData = new QMimeData;
-	QByteArray* bt = new QByteArray;
-	saveToByte(Buf, (*bt));
+	QByteArray* bt;
+
+	GESFileWriter writer;
+	*bt = writer.writeToByte( toGraph( Buf) );
+
 	mData->setData("Graph Editor Sloth/items", (*bt));
 	QClipboard *pastebuf = QApplication::clipboard();
 	pastebuf->setMimeData(mData);
@@ -301,13 +305,14 @@ void GESScene::pasteObj() {
 	if (!(QApplication::clipboard()->mimeData()->hasFormat(
 			"Graph Editor Sloth/items")))
 		return;
-	QList<QGraphicsItem*> list;
 	QByteArray bt;
-	bt = QApplication::clipboard()->mimeData()->data("graphics_Redactor/items");
+	bt = QApplication::clipboard()->mimeData()->data("Graph Editor Sloth/items");
+
 	GESFileLoader loader;
 	Graph* pasteGr = new Graph();
 	if( !loader.load( pasteGr, bt ) )
 		loader.showError();
+
 	addItemCommand* command = new addItemCommand(pasteGr, mGraph);
 	stackCommand->push(command);
 }
@@ -324,38 +329,7 @@ void GESScene::selectAll() {
 }
 
 void GESScene::saveToByte(QList<QGraphicsItem*>& itemsList, QByteArray& bt) {
-	QXmlStreamWriter stream(&bt);
-	QTextCodec *codec = QTextCodec::codecForName("windows-1251");
-	stream.setCodec(codec);
-	stream.setAutoFormatting(true);
-	stream.writeStartDocument();
-	stream.writeStartElement("GRAPH");
 
-	foreach(QGraphicsItem* item, itemsList)
-	{
-		if (item->type() == Node::Type) {
-			Node* node = qgraphicsitem_cast<Node*>(item);
-			stream.writeStartElement("node");
-			stream.writeAttribute("text", node->getText());
-			stream.writeAttribute("id",
-					QString::number(itemsList.indexOf(item)));
-			stream.writeEndElement();
-		}
-		if (item->type() == Edge::Type) {
-			Edge* edge = qgraphicsitem_cast<Edge*>(item);
-			stream.writeStartElement("edge");
-			stream.writeAttribute("text", edge->getText());
-			stream.writeAttribute("idsource",
-					QString::number(itemsList.indexOf(edge->sourceNode())));
-			stream.writeAttribute("iddest",
-					QString::number(itemsList.indexOf(edge->destNode())));
-			stream.writeEndElement();
-		}
-	}
-
-	stream.writeEndElement();
-	stream.writeEndDocument();
-	return;
 }
 
 void GESScene::undoCommand() {

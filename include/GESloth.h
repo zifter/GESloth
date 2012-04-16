@@ -35,12 +35,6 @@ public:
     //! Создание менюшек
     void createMenus();
 
-    //! Сохранить в файл
-    void saveToFile();
-
-    //! Загрузить из файла
-    void openFromFile();
-
 protected:
     //! Событие нажатия каких либо клавиш
     void keyPressEvent(QKeyEvent *event);

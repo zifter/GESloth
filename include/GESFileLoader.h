@@ -8,6 +8,7 @@
 #ifndef GESFILELOADER_H_
 #define GESFILELOADER_H_
 
+#include "GESTag.h"
 #include "Graph.h"
 #include "Node.h"
 #include "Edge.h"

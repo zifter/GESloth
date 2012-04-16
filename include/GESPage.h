@@ -43,6 +43,14 @@ public:
     	return view;
     }
 
+    void setFileName( const QString& name ){
+    	mFileName = name;
+    }
+
+    QString getFileName() const {
+    	return mFileName;
+    }
+
 
 public slots:
 
@@ -59,6 +67,9 @@ private:
 
     //! Просмоторщик
     GESView* mView;
+
+    //! Name of file
+    QString mFileName;
 };
 
 #endif /* GESPAGE_H_ */

@@ -6,7 +6,6 @@
  */
 
 #include "GESFileLoader.h"
-#include "GESTag.h"
 #include "Macros.h"
 
 #include <QApplication>
