@@ -26,23 +26,9 @@
 #include "Command.h"
 #include "Node.h"
 #include "Edge.h"
+#include "Macros.h"
 
-void GraphRedactorView::wheelEvent(QWheelEvent *event)
-{
-    if(event->delta()>0)
-    {
-        if(sceneScaleCombo->currentIndex() == 9)
-            return;
-        sceneScaleCombo->setCurrentIndex(sceneScaleCombo->currentIndex()+1);
-    }
-    else
-    {
-        if(sceneScaleCombo->currentIndex() == 0)
-            return;
-        sceneScaleCombo->setCurrentIndex(sceneScaleCombo->currentIndex()-1);
-    }
-}
-GraphRedactorScene::GraphRedactorScene( GraphWidget *prnt)
+GESScene::GESScene( GESloth *prnt)
     : Parent(prnt), line(NULL), point(NULL), menu(NULL)
 {
     QPainterPath path;
@@ -50,11 +36,13 @@ GraphRedactorScene::GraphRedactorScene( GraphWidget *prnt)
     myState = InsertNode;
 }
 
-void GraphRedactorScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     QGraphicsScene::mousePressEvent(mouseEvent);
+    /*
     if(mouseEvent->button() == Qt::LeftButton)
         QApplication::setOverrideCursor(Qt::PointingHandCursor);
+    */
     if(myState == InsertEdge && mouseEvent->button()==Qt::LeftButton && !items(mouseEvent->scenePos()).isEmpty())
     {
         if(items(mouseEvent->scenePos()).at(0)->type() == Node::Type )
@@ -83,29 +71,29 @@ void GraphRedactorScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     }
 }
 
-void GraphRedactorScene::addItems(QList<QGraphicsItem*> list)
+void GESScene::addItems(QList<QGraphicsItem*> list)
 {
     foreach( QGraphicsItem* item, list)
     {
         if(item->type() == Edge::Type)
         {
             Edge* edge = qgraphicsitem_cast< Edge* >(item);
-            edges << edge;
+            mGraph->add( edge );
             addItem(edge);
         }
         if(item->type() == Node::Type)
         {
             Node* node = qgraphicsitem_cast< Node* >(item);
             addItem(node);
-            addNode(node);
+            mGraph->add( node );
         }
     }
     if( 1 == myState)
-        foreach (Node *node, getNodes())
+        foreach ( Node *node, mGraph->nodes() )
             node->setFlag(QGraphicsItem::ItemIsMovable, false);
 }
 
-void GraphRedactorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void GESScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if (myState == InsertEdge && line != NULL)
     {
@@ -115,7 +103,7 @@ void GraphRedactorScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 
-void GraphRedactorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
+void GESScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     QApplication::restoreOverrideCursor();
     if(mouseEvent->button()==Qt::LeftButton)
@@ -143,7 +131,7 @@ void GraphRedactorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
                 Node* endNode =
                     qgraphicsitem_cast<Node *>(endItems.first());
                 bool flag = true;
-                foreach(Edge* edge, edges)
+                foreach(Edge* edge, mGraph->edges())
                     if(edge->checkEdge(startNode, endNode))
                     {
                         flag = false;
@@ -164,7 +152,7 @@ void GraphRedactorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
-void GraphRedactorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+void GESScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     QList< QGraphicsItem* > itemsUnderMouse = items(event->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder);
     if(menu)
@@ -191,14 +179,13 @@ void GraphRedactorScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     menu->exec(event->screenPos());
 }
 
-void GraphRedactorScene::deleteObj(QList<QGraphicsItem *> items)
+void GESScene::deleteObj(QList<QGraphicsItem *> items)
 {
     currentList = items;
     deleteObj();
 }
-void GraphRedactorScene::deleteObj()
+void GESScene::deleteObj()
 {
-
     foreach(QGraphicsItem *item, currentList)
     {
         if(item->type() == Node::Type)
@@ -206,25 +193,25 @@ void GraphRedactorScene::deleteObj()
             Node* node = qgraphicsitem_cast<Node*>(item);
             foreach(Edge* edge, node->OutEdges())
             {
-                edges.removeOne(edge);
+                mGraph->remove(edge);
             }
             foreach(Edge* edge, node->InEdges())
             {
-                edges.removeOne(edge);
+            	mGraph->remove(edge);
             }
             node->del();
-            nodes.removeOne(node);
+            mGraph->remove(node);
         }
         if(item->type() == Edge::Type)
         {
             Edge* edge = qgraphicsitem_cast<Edge*>(item);
             edge->del();
-            edges.removeOne(edge);
+            mGraph->remove(edge);
         }
         removeItem(item);
     }
 }
-void GraphRedactorScene::setName()
+void GESScene::setName()
 {
 
     QWidget* txt = new QWidget();
@@ -265,7 +252,7 @@ void GraphRedactorScene::setName()
     }
 }
 
-void GraphRedactorScene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* mouseEvent )
+void GESScene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* mouseEvent )
 {
     if(mouseEvent->button()==Qt::LeftButton && myState == InsertNode)
     {
@@ -279,7 +266,7 @@ void GraphRedactorScene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* mouseE
     }
 }
 
-void GraphRedactorScene::copyObj()
+void GESScene::copyObj()
 {
 
     QList< Node* > nodeScn;
@@ -296,7 +283,6 @@ void GraphRedactorScene::copyObj()
             nd->setText(nodeForText->getText());
             nodeBuf.insert( i, nd );
             nd->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
-            //node << nd;
             Buf << nd;
             i++;
         }
@@ -324,7 +310,7 @@ void GraphRedactorScene::copyObj()
     pastebuf->setMimeData( mData );
 }
 
-void GraphRedactorScene::pasteObj()
+void GESScene::pasteObj()
 {
     if(!(QApplication::clipboard()->mimeData()->hasFormat("graphics_Redactor/items")))
         return;
@@ -336,13 +322,20 @@ void GraphRedactorScene::pasteObj()
     stackCommand->push(command);
 }
 
-void GraphRedactorScene::selectAll()
+//! Копировать элементы
+void GESScene::cutObj(){
+	copyObj();
+	deleteSelectedObj();
+}
+
+
+void GESScene::selectAll()
 {
     foreach(QGraphicsItem* item, items())
         item->setSelected(true);
 }
 
-void GraphRedactorScene::saveToByte( QList< QGraphicsItem* >& itemsList, QByteArray& bt)
+void GESScene::saveToByte( QList< QGraphicsItem* >& itemsList, QByteArray& bt)
 {
     QXmlStreamWriter stream(&bt);
     QTextCodec *codec = QTextCodec::codecForName("windows-1251");
@@ -378,7 +371,7 @@ void GraphRedactorScene::saveToByte( QList< QGraphicsItem* >& itemsList, QByteAr
 }
 
 
-bool GraphRedactorScene::openFromByte( QList< QGraphicsItem* >& itemList, QByteArray& bt )
+bool GESScene::openFromByte( QList< QGraphicsItem* >& itemList, QByteArray& bt )
 {
     QString errorStr;
     int errorLine;
@@ -430,7 +423,7 @@ bool GraphRedactorScene::openFromByte( QList< QGraphicsItem* >& itemList, QByteA
     return true;
 }
 
-bool GraphRedactorScene::parseNode(QDomElement& node, QMap<int, Node*>& list)
+bool GESScene::parseNode(QDomElement& node, QMap<int, Node*>& list)
 {
     if (node.hasAttribute("text"))
     {
@@ -448,7 +441,7 @@ bool GraphRedactorScene::parseNode(QDomElement& node, QMap<int, Node*>& list)
     return false;
 }
 
-bool GraphRedactorScene::parseEdge(QDomElement& edge, QMap<int, Node*>&  list, QList< Edge* >& edges )
+bool GESScene::parseEdge(QDomElement& edge, QMap<int, Node*>&  list, QList< Edge* >& edges )
 {
     if (edge.hasAttribute("text"))
     {
@@ -479,17 +472,17 @@ bool GraphRedactorScene::parseEdge(QDomElement& edge, QMap<int, Node*>&  list, Q
     return false;
 }
 
-void GraphRedactorScene::undoCommand()
+void GESScene::undoCommand()
 {
     stackCommand->undo();
 }
 
-void GraphRedactorScene::redoCommand()
+void GESScene::redoCommand()
 {
     stackCommand->redo();
 }
 
-void GraphRedactorScene::deleteSelectedObj()
+void GESScene::deleteSelectedObj()
 {
     currentList = selectedItems();
     delItemCommand* command = new delItemCommand(currentList, this);
@@ -497,7 +490,7 @@ void GraphRedactorScene::deleteSelectedObj()
     deleteObj();
 }
 
-void GraphRedactorScene::deleteUnderMouseObj()
+void GESScene::deleteUnderMouseObj()
 {
     QList< QGraphicsItem* > a;
     a << currentItem;

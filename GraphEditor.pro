@@ -11,7 +11,7 @@ CONFIG(debug, debug|release) {
     # Set folder for object file
     OBJECTS_DIR = build/debug/obj/
     
-    # Set folder for moc_*.cpp file
+    # Set folder for msoc_*.cpp file
     MOC_DIR = build/debug/tmp/moc/
     DEFINES = DEBUG
     message("Creating Debug Makefile.")
@@ -39,7 +39,13 @@ SUBDIRS = src/
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/Object.h \
+HEADERS += include/Graph.h \
+    include/GESFileLoader.h \
+    include/GESTabWidget.h \
+    include/GESPage.h \
+    include/Macros.h \
+    include/GESView.h \
+    include/Object.h \
     include/Node.h \
     include/HelpBrowser.h \
     include/GESloth.h \
@@ -48,7 +54,12 @@ HEADERS += include/Object.h \
     include/Edge.h
 
 # Set source
-SOURCES += src/Object.cpp \
+SOURCES += src/Graph.cpp \
+    src/GESFileLoader.cpp \
+    src/GESTabWidget.cpp \
+    src/GESPage.cpp \
+    src/GESView.cpp \
+    src/Object.cpp \
     src/Node.cpp \
     src/HelpBrowser.cpp \
     src/GESloth.cpp \
@@ -62,6 +73,6 @@ TRANSLATIONS += media/translations/graphicsRedactor_ru.ts \
     media/translations/graphicsRedactor_en.ts
 
 # Resource
-RESOURCES += media/GraphRedactor.qrc
+RESOURCES += media/GESResource.qrc
 TEMPLATE = app
 TARGET = GESloth

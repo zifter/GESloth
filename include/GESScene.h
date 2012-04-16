@@ -1,12 +1,14 @@
-#ifndef GRAPHREDACTORSCENE_H
-#define GRAPHREDACTORSCENE_H
+#ifndef GESSCENE_H
+#define GESSCENE_H
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QMimeData>
 #include <QGraphicsView>
 
-class GraphWidget;
+#include "Graph.h"
+
+class GESloth;
 class Node;
 class Edge;
 class QMenu;
@@ -19,188 +21,124 @@ class QUndoStack;
 class QWheelEvent;
 class QComboBox;
 
-//! Просмоторщик сцены
-class GraphRedactorView : public QGraphicsView
-{
-    Q_OBJECT
+class GESScene: public QGraphicsScene {
+Q_OBJECT
 
 public:
-    //! Пустой конструктоh
-   GraphRedactorView(){}
+	GESScene( GESloth* prnt = 0 );
+	virtual ~GESScene() {
+	}
+	;
 
-    //! Комбо бокс для изменения масштаба
-   QComboBox* sceneScaleCombo;
+	//! Возможные состояния системы
+	enum State {
+		InsertNode, InsertEdge
+	};
 
-protected:
-    //! Колесико
-    void wheelEvent(QWheelEvent *event);
-
-};
-
-class GraphRedactorScene : public QGraphicsScene
-{
-    Q_OBJECT
-
-public:
-   GraphRedactorScene(GraphWidget*);
-
-    //! Возможные состояния системы
-    enum State { InsertNode, InsertEdge };
-
-    //! Добавить вершину
-    void addNode(Node* nd)
-    {        nodes << nd;
-    }
-
-    //! Добавить ребро
-    void addEdge(Edge* dg)
-    {        edges << dg;
-    }
-
-    //! Получить лист вершин
-    QList<Node*> getNodes()
-    {       return nodes;
-    }
-
-    //! Получить лист ребер
-    QList<Edge*> getEdges()
-    {       return edges;
-    }
-
-    //! Добавить объекты списка
-    void addItems(QList<QGraphicsItem*> list);
+	//! Добавить объекты списка
+	void addItems(QList<QGraphicsItem*> list);
 
 public slots:
-    //! Установка состояния
-    void setState(State state)
-    {        myState = state;
-    }
+	//! Установка состояния
+	void setState(State state) {
+		myState = state;
+	}
 
-    //! Получить состояние
-    State getState()
-    {        return myState;
-    }
+	//! Получить состояние
+	State getState() {
+		return myState;
+	}
 
-    //! Удалить
-    void deleteSelectedObj();
+	//! Удалить
+	void deleteSelectedObj();
 
-    //! Удалить
-    void deleteUnderMouseObj();
+	//! Удалить
+	void deleteUnderMouseObj();
 
-    //! Удалить объекты списка
-    void deleteObj(QList<QGraphicsItem*> itemList);
+	//! Удалить объекты списка
+	void deleteObj(QList<QGraphicsItem*> itemList);
 
-    //! Удалить объекты текущего списка
-    void deleteObj();
+	//! Удалить объекты текущего списка
+	void deleteObj();
 
-    //! Установить имя
-    void setName();
+	//! Установить имя
+	void setName();
 
-    //! Копировать элементы
-    void copyObj();
+	//! Копировать элементы
+	void copyObj();
 
-    //! Выделить все
-    void selectAll();
+	//! Копировать элементы
+	void cutObj();
 
-    //! Вставить
-    void pasteObj();
+	//! Выделить все
+	void selectAll();
 
-    //! Сохраняет лист объектов в массив байтов в XML-формате
-    void saveToByte( QList< QGraphicsItem* >& itemList, QByteArray& );
+	//! Вставить
+	void pasteObj();
 
-    //! Загружает из массива байтов в лист объекты
-    bool openFromByte( QList< QGraphicsItem* >& , QByteArray& );
+	//! Сохраняет лист объектов в массив байтов в XML-формате
+	void saveToByte(QList<QGraphicsItem*>& itemList, QByteArray&);
 
-    //! Команда назад
-    void undoCommand();
+	//! Загружает из массива байтов в лист объекты
+	bool openFromByte(QList<QGraphicsItem*>&, QByteArray&);
 
-    //! Команда вперед
-    void redoCommand();
+	//! Команда назад
+	void undoCommand();
+
+	//! Команда вперед
+	void redoCommand();
 
 protected:
-    //! Событие нажатия кнопки
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	//! Событие нажатия кнопки
+	void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
-    //! Событие двежение зажатой мышки
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	//! Событие двежение зажатой мышки
+	void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
-    //! Событие отпускание кнопки
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	//! Событие отпускание кнопки
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
-    //! Событие двойного щелчка
-    void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * mouseEvent );
+	//! Событие двойного щелчка
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
 
-    //! Событие вызова контекстного меню
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+	//! Событие вызова контекстного меню
+	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
-    //! Состояние
-    State myState;
+	//! Состояние
+	State myState;
 
-    //! Родитель
-    GraphWidget *Parent;
+	//! Graph which contains on scene
+	Graph* mGraph;
 
-    //! Линия
-    QGraphicsLineItem *line;
+	//! Родитель
+	GESloth *Parent;
 
-    //! Лист вершин
-    QList< Node* > nodes;
+	//! Линия
+	QGraphicsLineItem *line;
 
-    //! Лист ребер
-    QList< Edge* > edges;
+	//! Контрольная точка
+	QPointF *point;
 
-    //! Контрольная точка
-    QPointF *point;
+	//! Меню
+	QMenu *menu;
 
-    //! Меню
-    QMenu *menu;
+	//! Текущий элемент
+	QGraphicsItem* currentItem;
 
-    //! Текущий элемент
-    QGraphicsItem* currentItem;
+	//! Текущие объекты
+	QList<QGraphicsItem*> currentList;
 
-    //! Текущие объекты
-    QList<QGraphicsItem*> currentList;
+	//! Разбор вершины
+	bool parseNode(QDomElement& node, QMap<int, Node*>& list);
 
-    //! Разбор вершины
-    bool parseNode(QDomElement& node, QMap<int, Node*>& list);
+	//! Разбор ребра
+	bool parseEdge(QDomElement& edge, QMap<int, Node*>& list
+			, QList<Edge*>& edges);
 
-    //! Разбор ребра
-    bool parseEdge(QDomElement& edge, QMap<int, Node*>&  list, QList< Edge* >& edges );
-
-    //! Стек команд
-    QUndoStack* stackCommand;
+	//! Стек команд
+	QUndoStack* stackCommand;
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif // GRAPHREDACTORSCENE_H

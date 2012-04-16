@@ -29,6 +29,9 @@ public:
     //! Удалить ребро
     void del();
 
+    //! Returns length of edge
+    qreal length();
+
     //! Проверить ребро на то, что src и dst являеються иточником и концом ребра
     bool checkEdge(Node* src, Node* dst);
 

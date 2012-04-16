@@ -1,11 +1,12 @@
-#ifndef GRAPHWIDGET_H
-#define GRAPHWIDGET_H
+#ifndef GESLOTH_H
+#define GESLOTH_H
 
 #include <QMainWindow>
+#include <QIcon>
+#include <QTabWidget>
 
 class Node;
 class Edge;
-class GraphRedactorScene;
 class Object;
 class QButtonGroup;
 class QToolBar;
@@ -15,20 +16,21 @@ class QGraphicsItem;
 class QComboBox;
 class QApplication;
 class QTranslator;
-class GraphRedactorView;
+class GESTabWidget;
+class QLineEdit;
+class GESScene;
+class GESView;
 
-class GraphWidget : public QMainWindow
+class GESloth : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    GraphWidget(QApplication*);
+    GESloth(QApplication*);
+    virtual ~GESloth(){};
 
     //! Объекты нуждаються в передвижении
     void itemMoved();
-
-    //! Удалить объект
-    void delItem(Object* obj);
 
     //! Создание менюшек
     void createMenus();
@@ -43,19 +45,16 @@ protected:
     //! Событие нажатия каких либо клавиш
     void keyPressEvent(QKeyEvent *event);
 
-    //! Событие таймера
-    void timerEvent(QTimerEvent *event);
-
-    //! Фактор увелечения
-    void scaleView(qreal scaleFactor);
-
     //! Создание панели инструментов
     void createToolBar();
 
-public slots:
+    //! Create action in window
+    void createAction();
 
-    //! Слот для изменения состояния
-    void pointerGroupClicked( int );
+    //! return icon path
+    QIcon getIcon(const QString& name );
+
+private slots:
 
     //! Экспортировка в изображение
     void exportToImage();
@@ -63,11 +62,16 @@ public slots:
     //! Об этой лабе
     void about();
 
+    /**
+     * @brief Create new page
+     */
+    void newPage();
+
+    //! Слот для изменения состояния
+    void pointerStateChanged( int );
+
     //! О Кьют
     void aboutQt();
-
-    //! Изменение увеличения сцены
-    void sceneScaleChanged(const QString &scale);
 
     //! Отключить псевдо физику
     void switchOff(bool);
@@ -87,28 +91,57 @@ public slots:
     //! Вызов контекстной помощи
     void help();
 
+	/**
+	 *	@brief Method for change view scale
+	 */
+    void viewScaleChanged(qreal);
+
+	/**
+	 * @breif Method for change scale factor
+	 */
+	void zoomIn();
+
+	/**
+	 * @breif Method for change scale factor
+	 */
+	void zoomOut();
+
 private:
+
+    //! Tab widget
+    GESTabWidget* tabWidget;
+
+    //! Contents current zoom factor.
+    QLineEdit* mZoomFactorLine;
+
+    //! Default scale factor
+    qint32 mScaleFactorChange;
 
     //! Индификатор таймера
     int timerId;
-
-    //! Для установки масштаба
-    QComboBox* sceneScaleCombo;
-
-    //! Сцена
-    GraphRedactorScene* scene;
-
-    //! Просмоторщик
-    GraphRedactorView* view;
 
     //! Группа кнопок
     QButtonGroup *pointerTypeGroup;
 
     //! Панель инструментов
-    QToolBar *pointerToolbar;
+    QToolBar *mToolBar;
 
     //! Имя файла
     QString NameOfFile;
+
+    QAction* mActionCut;
+    QAction* mActionPaste;
+    QAction* mActionCopy;
+    QAction* mActionDelete;
+    QAction* mActionRedo;
+	QAction* mActionUndo;
+    QAction* mActionSelectAll;
+
+    // ! Minimun scale factor
+    qint32 minScaleFactor;
+
+    // ! Maximum scale factor
+    qint32 maxScaleFactor;
 };
 
 #endif

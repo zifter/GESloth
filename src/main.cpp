@@ -2,6 +2,7 @@
 #include <QtGui>
 
 #include "GESloth.h"
+#include "Macros.h"
 
 int main(int argc, char **argv)
 {
@@ -18,7 +19,7 @@ int main(int argc, char **argv)
     translator.load("media/translations/" + tranas);
     app.installTranslator(&translator);
 
-    GraphWidget widget(&app);
+    GESloth widget(&app);
     widget.show();
 
     return app.exec();

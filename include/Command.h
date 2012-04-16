@@ -1,5 +1,5 @@
-#ifndef GRAPHUNDOCOMMAND_H
-#define GRAPHUNDOCOMMAND_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include <QUndoCommand>
 #include "GESScene.h"
@@ -14,15 +14,15 @@ class addItemCommand : public QUndoCommand
 public:
 
     //! Конструктор команды
-    addItemCommand( QList<QGraphicsItem*> lst,  GraphRedactorScene* scn) : list(lst), scene(scn)
+    addItemCommand( QList<QGraphicsItem*> lst,  GESScene* scn) : list(lst), scene(scn)
     {}
 
     //! Команда вперед
     virtual void undo()
     {
-        scene->deleteObj(list);
-        foreach (Node *node, scene->getNodes())
-            node->calculateForces();
+        ///scene->deleteObj(list);
+        //foreach (Node *node, scene->getNodes())
+        //    node->calculateForces();
     }
     //! Команда вперед
     virtual void redo();
@@ -33,7 +33,7 @@ private:
     QList<QGraphicsItem*> list;
 
     //! Сцена, куда добавляеться
-    GraphRedactorScene* scene;
+    GESScene* scene;
 
 };
 
@@ -43,7 +43,7 @@ class delItemCommand : public QUndoCommand
 public:
 
     //! Конструктор команды
-    delItemCommand( QList<QGraphicsItem*> lst,  GraphRedactorScene* scn) : list(lst), scene(scn)
+    delItemCommand( QList<QGraphicsItem*> lst,  GESScene* scn) : list(lst), scene(scn)
     {}
 
     //! Команда назад
@@ -52,9 +52,9 @@ public:
     //! Команда вперед
     virtual void redo()
     {
-        scene->deleteObj(list);
-        foreach (Node *node, scene->getNodes())
-            node->calculateForces();
+        //scene->deleteObj(list);
+        //foreach (Node *node, scene->getNodes())
+       //     node->calculateForces();
     }
 
 private:
@@ -63,7 +63,7 @@ private:
     QList<QGraphicsItem*> list;
 
     //! Сцена, откуда удаляются
-    GraphRedactorScene* scene;
+    GESScene* scene;
 };
 
 //! Команда установки текста
@@ -103,4 +103,4 @@ private:
 };
 
 
-#endif // GRAPHUNDOCOMMAND_H
+#endif // COMMAND_H

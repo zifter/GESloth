@@ -6,13 +6,13 @@
 #include "Object.h"
 
 class Edge;
-class GraphWidget;
+class GESloth;
 class QGraphicsSceneMouseEvent;
 
 class Node : public Object
 {
 public:
-    Node(GraphWidget *graphWidget);
+    Node(GESloth *graphWidget);
 
     //! Добавить ребро
     void addEdge( Edge *edge);
@@ -77,7 +77,7 @@ private:
     QPointF newPos;
 
     //! Родитель
-    GraphWidget *graph;
+    GESloth *graph;
 
 };
 
