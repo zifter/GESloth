@@ -85,8 +85,8 @@ void GESloth::createToolBar() {
 
 	pointerTypeGroup->addButton(pointerButton, int(GESScene::InsertNode));
 	pointerTypeGroup->addButton(linePointerButton, int(GESScene::InsertEdge));
-	connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), this,
-			SLOT(pointerStateChanged(int)));
+	connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), tabWidget,
+			SLOT(setSceneState(int)));
 
 	QToolButton *switchOff = new QToolButton;
 	switchOff->setCheckable(true);
@@ -440,18 +440,6 @@ QIcon GESloth::getIcon(const QString& name) {
 void GESloth::newPage(){
 	tabWidget->addPage();
 }
-
-void GESloth::pointerStateChanged(int state ) {
-	PRINT(state)
-//	scene->setState(GESScene::State(pointerTypeGroup->checkedId()));
-//	if (1 == scene->getState())
-//		foreach (Node *node, scene->getNodes())
-//			node->setFlag(QGraphicsItem::ItemIsMovable, false);
-//	else
-//		foreach(Node *node, scene->getNodes())
-//			node->setFlag(QGraphicsItem::ItemIsMovable, true);
-}
-
 
 void GESloth::viewScaleChanged(qreal newScale) {
 	qreal oldScale = mZoomFactorLine->text().remove('%').toDouble() / 100;

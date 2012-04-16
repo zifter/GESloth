@@ -67,9 +67,6 @@ private slots:
      */
     void newPage();
 
-    //! Слот для изменения состояния
-    void pointerStateChanged( int );
-
     //! О Кьют
     void aboutQt();
 

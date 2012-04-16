@@ -6,8 +6,6 @@
 #include <QMimeData>
 #include <QGraphicsView>
 
-#include "Graph.h"
-
 class GESloth;
 class Node;
 class Edge;
@@ -20,6 +18,7 @@ class QDomElement;
 class QUndoStack;
 class QWheelEvent;
 class QComboBox;
+class Graph;
 
 class GESScene: public QGraphicsScene {
 Q_OBJECT
@@ -40,9 +39,7 @@ public:
 
 public slots:
 	//! Установка состояния
-	void setState(State state) {
-		myState = state;
-	}
+	void setState(State state);
 
 	//! Получить состояние
 	State getState() {
@@ -105,6 +102,9 @@ protected:
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
+
+	Graph* toGraph( QList<QGraphicsItem*>& itemList );
+
 	//! Состояние
 	State myState;
 

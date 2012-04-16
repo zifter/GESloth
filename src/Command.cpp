@@ -3,31 +3,20 @@
 #include "Edge.h"
 #include "Node.h"
 
-void addItemCommand::redo()
+void addItemCommand::undo()
 {
-    foreach(QGraphicsItem* item, list)
-        if(item->type() == Edge::Type)
-        {
-            Edge* edge = qgraphicsitem_cast< Edge* >(item);
-            edge->destNode()->addInEdge(edge);
-            edge->sourceNode()->addOutEdge(edge);
-        }
-    scene->addItems( list );
-    foreach (Node *node, scene->getNodes())
-        node->calculateForces();
-
+	mGraph->remove(change);
 }
 
-void delItemCommand::undo()
+void addItemCommand::redo() {
+	mGraph->add(change);
+}
+
+void delItemCommand::redo()
 {
-    foreach(QGraphicsItem* item, list)
-        if(item->type() == Edge::Type)
-        {
-            Edge* edge = qgraphicsitem_cast< Edge* >(item);
-            edge->destNode()->addInEdge(edge);
-            edge->sourceNode()->addOutEdge(edge);
-        }
-    scene->addItems( list );
-    foreach (Node *node, scene->getNodes())
-        node->calculateForces();
+	mGraph->remove(change);
+}
+
+void delItemCommand::undo() {
+	mGraph->add(change);
 }

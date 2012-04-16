@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/image">
+        <file alias="linepointer">images/linepointer.png</file>
+        <file alias="pointer">images/pointer.png</file>
+        <file alias="switchOff">images/switchOff.png</file>
+        <file alias="zoomOut">images/toolZoomOut.png</file>
+        <file alias="zoomIn">images/toolZoomIn.png</file>
+        <file alias="undo">images/edit-undo.png</file>
+        <file alias="selectAll">images/edit-select-all.png</file>
+        <file alias="redo">images/edit-redo.png</file>
+        <file alias="paste">images/edit-paste.png</file>
+        <file alias="delete">images/edit-delete.png</file>
+        <file alias="cut">images/edit-cut.png</file>
+        <file alias="copy">images/edit-copy.png</file>
+        <file alias="clear">images/edit-clear.png</file>
+    </qresource>
+    <qresource prefix="/doc">
+        <file>doc/modeselect.html</file>
+        <file>doc/modemove.html</file>
+        <file>doc/modeedge.html</file>
+        <file>doc/index.html</file>
+        <file>doc/fail.html</file>
+    </qresource>
+</RCC>

@@ -5,102 +5,88 @@
 #include "GESScene.h"
 #include "Object.h"
 #include "Node.h"
+#include "Graph.h"
 
 class QGraphicsItem;
 
 //! Команда добавления объектов
-class addItemCommand : public QUndoCommand
-{
+class addItemCommand: public QUndoCommand {
 public:
 
-    //! Конструктор команды
-    addItemCommand( QList<QGraphicsItem*> lst,  GESScene* scn) : list(lst), scene(scn)
-    {}
+	//! Конструктор команды
+	addItemCommand(Graph* changeGraph, Graph* defGraph) :
+			change(changeGraph), mGraph(defGraph) {
+	}
 
-    //! Команда вперед
-    virtual void undo()
-    {
-        ///scene->deleteObj(list);
-        //foreach (Node *node, scene->getNodes())
-        //    node->calculateForces();
-    }
-    //! Команда вперед
-    virtual void redo();
+	//! Undo command
+	virtual void undo();
+	//! Redo command
+	virtual void redo();
 
 private:
 
-    //! Список, который добавляется
-    QList<QGraphicsItem*> list;
+	//! Graph which added
+	Graph* change;
 
-    //! Сцена, куда добавляеться
-    GESScene* scene;
+	//! Initial graph
+	Graph* mGraph;
 
 };
 
 //! Команда удаления объектов
-class delItemCommand : public QUndoCommand
-{
+class delItemCommand: public QUndoCommand {
 public:
 
-    //! Конструктор команды
-    delItemCommand( QList<QGraphicsItem*> lst,  GESScene* scn) : list(lst), scene(scn)
-    {}
+	//! Конструктор команды
+	delItemCommand(Graph* changeGraph, Graph* defGraph) :
+			change(changeGraph), mGraph(defGraph) {
+	}
 
-    //! Команда назад
-    virtual void undo();
-
-    //! Команда вперед
-    virtual void redo()
-    {
-        //scene->deleteObj(list);
-        //foreach (Node *node, scene->getNodes())
-       //     node->calculateForces();
-    }
+	//! Undo command
+	virtual void undo() ;
+	//! Redo command
+	virtual void redo() ;
 
 private:
 
-    //! Список удаляемых объектов
-    QList<QGraphicsItem*> list;
+	//! Graph which added
+	Graph* change;
 
-    //! Сцена, откуда удаляются
-    GESScene* scene;
+	//! Initial graph
+	Graph* mGraph;
 };
 
 //! Команда установки текста
-class setTextCommand : public QUndoCommand
-{
+class setTextCommand: public QUndoCommand {
 public:
 
-    //! Коструктор команды
-    setTextCommand( Object* obj, QString text) : SetableText(text), PastText(obj->getText())
-    {
-        object = obj;
-    }
+	//! Коструктор команды
+	setTextCommand(Object* obj, QString text) :
+			SetableText(text), PastText(obj->getText()) {
+		object = obj;
+	}
 
-    //! Команда назад
-    virtual void undo()
-    {
-        object->setText(PastText);
-        object->update();
-    }
+	//! Команда назад
+	virtual void undo() {
+		object->setText(PastText);
+		object->update();
+	}
 
-    //! Команда вперед
-    virtual void redo()
-    {
-        object->setText(SetableText);
-        object->update();
-    }
+	//! Команда вперед
+	virtual void redo() {
+		object->setText(SetableText);
+		object->update();
+	}
 
 private:
-    //! Объект которому устанавливаеться текст
-    Object* object;
+	//! Объект которому устанавливаеться текст
+	Object* object;
 
-    //! Устанавливаемый текст
-    QString SetableText;
+	//! Устанавливаемый текст
+	QString SetableText;
 
-    //! Предыдущий текст
-    QString PastText;
+	//! Предыдущий текст
+	QString PastText;
 };
-
 
 #endif // COMMAND_H

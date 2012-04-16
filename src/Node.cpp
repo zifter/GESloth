@@ -52,13 +52,13 @@ void Node::del() {
 	foreach(Edge* edge, InEdges())
 	{
 		edge->del();
-		InEdgeList.removeOne(edge);
+		//InEdgeList.removeOne(edge);
 //		graph->delItem(edge);
 	}
 	foreach(Edge* edge, OutEdges())
 	{
 		edge->del();
-		OutEdgeList.removeOne(edge);
+		//OutEdgeList.removeOne(edge);
 //		graph->delItem(edge);
 	}
 }
