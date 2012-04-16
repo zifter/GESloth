@@ -8,6 +8,7 @@
 #include "GESTabWidget.h"
 #include "GESScene.h"
 #include "GESView.h"
+#include "Macros.h"
 
 GESTabWidget::GESTabWidget() {
 
@@ -122,6 +123,12 @@ void GESTabWidget::cutObj(){
 	GESPage* page = getCurrentPage();
 	if( getCurrentPage() != 0 )
 		page->getScene()->cutObj();
+}
+
+void GESTabWidget::clear(){
+	GESPage* page = getCurrentPage();
+	if( getCurrentPage() != 0 )
+		page->getScene()->clear();
 }
 
 GESPage* GESTabWidget::getCurrentPage(){

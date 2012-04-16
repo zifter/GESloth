@@ -78,8 +78,7 @@ public slots:
 	//! Вставить
 	void pasteObj();
 
-	//! Сохраняет лист объектов в массив байтов в XML-формате
-	void saveToByte(QList<QGraphicsItem*>& itemList, QByteArray&);
+	void clear();
 
 	//! Команда назад
 	void undoCommand();

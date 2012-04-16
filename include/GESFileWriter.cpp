@@ -9,6 +9,7 @@
 #include "GESTag.h"
 #include "Edge.h"
 #include "Node.h"
+#include "Macros.h"
 
 #include <QXmlStreamWriter>
 #include <QTextCodec>
@@ -23,15 +24,15 @@ GESFileWriter::~GESFileWriter() {
 	// TODO Auto-generated destructor stub
 }
 
-void GESFileWriter::write( Graph* graph, QString name ){
-	QFile fileOut( name );
+void GESFileWriter::write(Graph* graph, QString name) {
+	QFile fileOut(name);
 	if (!fileOut.open(QFile::WriteOnly | QFile::Text))
 		return;
 	fileOut.write(writeToByte(graph));
 	fileOut.close();
 }
 
-QByteArray& GESFileWriter::writeToByte( Graph* graph ){
+QByteArray& GESFileWriter::writeToByte(Graph* graph) {
 	QByteArray* bt = new QByteArray();
 	QXmlStreamWriter stream(bt);
 	QTextCodec *codec = QTextCodec::codecForName("windows-1251");
@@ -42,21 +43,21 @@ QByteArray& GESFileWriter::writeToByte( Graph* graph ){
 
 	foreach(Node* node, graph->nodes())
 	{
-			stream.writeStartElement(tag::XML_NODE);
-			stream.writeAttribute(attr::XML_TEXT, node->getText());
-			stream.writeAttribute(attr::XML_ID,
-					QString::number(graph->nodes().indexOf(node)));
-			stream.writeEndElement();
+		stream.writeStartElement(tag::XML_NODE);
+		stream.writeAttribute(attr::XML_TEXT, node->getText());
+		stream.writeAttribute(attr::XML_ID,
+				QString::number(graph->nodes().indexOf(node)));
+		stream.writeEndElement();
 	}
 	foreach(Edge* edge, graph->edges())
 	{
-			stream.writeStartElement(tag::XML_EDGE);
-			stream.writeAttribute(attr::XML_TEXT, edge->getText());
-			stream.writeAttribute(attr::XML_ID_SOURCE,
-					QString::number(graph->nodes().indexOf(edge->sourceNode())));
-			stream.writeAttribute(attr::XML_ID_DEST,
-					QString::number(graph->nodes().indexOf(edge->destNode())));
-			stream.writeEndElement();
+		stream.writeStartElement(tag::XML_EDGE);
+		stream.writeAttribute(attr::XML_TEXT, edge->getText());
+		stream.writeAttribute(attr::XML_ID_SOURCE,
+				QString::number(graph->nodes().indexOf(edge->sourceNode())));
+		stream.writeAttribute(attr::XML_ID_DEST,
+				QString::number(graph->nodes().indexOf(edge->destNode())));
+		stream.writeEndElement();
 	}
 
 	stream.writeEndElement();

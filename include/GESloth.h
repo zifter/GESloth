@@ -126,6 +126,7 @@ private:
     QAction* mActionDelete;
     QAction* mActionRedo;
 	QAction* mActionUndo;
+	QAction* mActionClear;
     QAction* mActionSelectAll;
 
     // ! Minimun scale factor

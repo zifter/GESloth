@@ -7,30 +7,30 @@
 
 #include "Graph.h"
 #include "Macros.h"
-Graph::Graph() : mScene(0) {
+Graph::Graph() :
+		mScene(0) {
 
 }
 
 Graph::~Graph() {
 }
 
-void Graph::setScene(GESScene* scn ){
+void Graph::setScene(GESScene* scn) {
 	mScene = scn;
 	foreach(Node* node, mNodes )
 	{
-		mScene->addItem( node );
+		mScene->addItem(node);
 	}
 	foreach(Edge* edge, mEdges )
 	{
-		mScene->addItem( edge );
+		mScene->addItem(edge);
 	}
 }
-
 
 void Graph::add(Graph* gr) {
 	foreach(Edge* edge, gr->edges())
 	{
-		if( !mEdges.contains( edge ) ){
+		if (!mEdges.contains(edge)) {
 			edge->destNode()->addInEdge(edge);
 			edge->sourceNode()->addOutEdge(edge);
 			add(edge);
@@ -38,41 +38,44 @@ void Graph::add(Graph* gr) {
 	}
 	foreach(Node* nd, gr->nodes())
 	{
-		if( !mNodes.count( nd ) )
-				add( nd );
+		if (!mNodes.count(nd))
+			add(nd);
 	}
 }
 
-bool Graph::remove( Node* node ){
-	if( mScene != 0 )
-		mScene->removeItem( node );
+bool Graph::remove(Node* node) {
+	if (mScene != 0)
+		mScene->removeItem(node);
 	foreach(Edge* edge, node->OutEdges())
 	{
 		remove(edge);
 	}
 	foreach(Edge* edge, node->InEdges())
 	{
-		remove( edge );
+		remove(edge);
 	}
 	node->del();
-	return mNodes.removeOne( node );
+	return mNodes.removeOne(node);
 }
 
 bool Graph::remove(Graph* gr) {
 	foreach(Node* node, gr->nodes())
 	{
-		if( mNodes.contains( node ) ){
+		if (mNodes.contains(node)) {
 			remove(node);
 		}
 	}
 
 	foreach(Edge* edge, gr->edges())
 	{
-		if( mEdges.contains( edge ) ){
+		if (mEdges.contains(edge)) {
 			remove(edge);
 		}
 	}
 
 	return true;
+}
 
+void Graph::removeAll() {
+	remove( this );
 }

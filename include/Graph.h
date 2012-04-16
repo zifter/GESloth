@@ -61,8 +61,10 @@ public:
 	//! Remove node
 	bool remove( Node* node );
 
+	//! Remove graph
 	bool remove( Graph* gr );
 
+	void removeAll();
 private:
 	//! Лист вершин
 	QList<Node*> mNodes;

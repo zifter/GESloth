@@ -121,6 +121,7 @@ void GESloth::createMenus() {
 	menuEdit->addSeparator();
 	menuEdit->addAction(mActionSelectAll);
 	menuEdit->addSeparator();
+	menuEdit->addAction(mActionClear);
 	menuEdit->addAction(mActionDelete);
 	menuEdit->addSeparator();
 	menuEdit->addAction(mActionRedo);
@@ -317,6 +318,16 @@ void GESloth::createAction() {
 	mActionDelete->setStatusTip("Delete selected items");
 	connect(mActionDelete, SIGNAL(triggered()), tabWidget,
 			SLOT(deleteSelectedObj()));
+
+	// clear
+	mActionClear = new QAction(
+			QIcon::fromTheme("edit-clear", getIcon("clear")), tr("Clear..."),
+			this);
+	mActionClear->setShortcut(QKeySequence::Refresh);
+	mActionClear->setIconVisibleInMenu(true);
+	mActionClear->setStatusTip("Clear page");
+	connect(mActionClear, SIGNAL(triggered()), tabWidget,
+			SLOT(clear()));
 
 	// cut
 	mActionCut = new QAction(QIcon::fromTheme("edit-cut", getIcon("cut")),

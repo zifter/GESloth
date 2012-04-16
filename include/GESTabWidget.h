@@ -48,6 +48,8 @@ public slots:
 
 	void cutObj();
 
+	void clear();
+
 signals:
 	void scaleChanged(qreal);
 

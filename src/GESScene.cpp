@@ -182,6 +182,11 @@ void GESScene::deleteObj(QList<QGraphicsItem *> items) {
 	currentList = items;
 	deleteObj();
 }
+
+void GESScene::clear(){
+	mGraph->removeAll();
+}
+
 void GESScene::deleteObj() {
 	foreach(QGraphicsItem *item, currentList)
 	{
@@ -258,7 +263,6 @@ void GESScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) {
 }
 
 void GESScene::copyObj() {
-
 	QList<Node*> nodeScn;
 	QList<Node*> nodeBuf;
 	QList<QGraphicsItem*> Buf;
@@ -290,12 +294,10 @@ void GESScene::copyObj() {
 			}
 		}
 	}
+
 	QMimeData *mData = new QMimeData;
-	QByteArray* bt;
-
 	GESFileWriter writer;
-	*bt = writer.writeToByte( toGraph( Buf) );
-
+	QByteArray* bt = &writer.writeToByte( toGraph( Buf) );
 	mData->setData("Graph Editor Sloth/items", (*bt));
 	QClipboard *pastebuf = QApplication::clipboard();
 	pastebuf->setMimeData(mData);
@@ -326,10 +328,6 @@ void GESScene::cutObj() {
 void GESScene::selectAll() {
 	foreach(QGraphicsItem* item, items())
 		item->setSelected(true);
-}
-
-void GESScene::saveToByte(QList<QGraphicsItem*>& itemsList, QByteArray& bt) {
-
 }
 
 void GESScene::undoCommand() {
