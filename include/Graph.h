@@ -21,9 +21,7 @@ public:
 	Graph();
 	~Graph();
 
-	void setScene(GESScene* scn ){
-		mScene = scn;
-	}
+	void setScene(GESScene* scn );
 
 	//! Add node in graph
 	void add( Node* nd) {

@@ -18,7 +18,13 @@ GESTabWidget::~GESTabWidget() {
 }
 
 void GESTabWidget::addPage(){
-	addTab(new GESPage(), "New page");
+	addTab(new GESPage(), tr("New page"));
+}
+
+void GESTabWidget::addPage( QString& name, Graph* graph ){
+	GESPage* page = new GESPage( );
+	page->getScene()->setGraph( graph );
+	addTab( page, name );
 }
 
 void GESTabWidget::setSceneState( int st ){
@@ -34,6 +40,40 @@ void GESTabWidget::setScale(const QString& sc ){
 }
 
 QPixmap* GESTabWidget::getViewportPixmap(){
+
+
+
+//    SCgScene *scene = qobject_cast<SCgScene*>(input);
+//
+//    QSize sz = scene->itemsBoundingRect().size().toSize();
+//    QRect rect = scene->itemsBoundingRect().toRect();
+//
+//    QString isSVG = file_name.mid(file_name.length()-3);
+//   /* if(isSVG=="svg"){
+//         QSvgGenerator generator;
+//         generator.setFileName(file_name);
+//         generator.setSize(sz);
+//         generator.setViewBox(rect);
+//         //generator.setTitle(tr("SVG image for GWF"));
+//         generator.setDescription(tr("An SVG drawing created by Knowledge base Editor."));
+//         QPainter painter(&generator);
+//         painter.setRenderHint(QPainter::Antialiasing,true);
+//         scene->render(&painter,QRect(QPoint(0,0), sz),scene->itemsBoundingRect());
+//         return true;
+//     }
+//    else*/{
+//        QImage img(sz,QImage::Format_ARGB32_Premultiplied);
+//        if (!img.isNull())
+//        {
+//            QPainter painter(&img);
+//            painter.setRenderHint(QPainter::Antialiasing, true);
+//            painter.eraseRect(QRect(QPoint(0,0),sz));
+//            scene->renderToImage(&painter, QRect(QPoint(0,0), sz), scene->itemsBoundingRect());
+//            return img.save(file_name);
+//        }
+//
+//
+
 	GESPage* page = getCurrentPage();
 
 	if( getCurrentPage() == 0 )

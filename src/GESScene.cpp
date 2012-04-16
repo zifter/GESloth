@@ -27,6 +27,7 @@
 #include "Node.h"
 #include "Edge.h"
 #include "Macros.h"
+#include "GESFileLoader.h"
 
 GESScene::GESScene(GESloth *prnt) :
 		Parent(prnt), line(NULL), point(NULL), menu(NULL) {
@@ -42,6 +43,11 @@ void GESScene::setState(State state){
 	bool movable = ( myState != InsertEdge );
 	foreach (Node *node, mGraph->nodes() )
 		node->setFlag(QGraphicsItem::ItemIsMovable, movable);
+}
+
+void GESScene::setGraph( Graph* gr ){
+	mGraph = gr;
+	mGraph->setScene(this);
 }
 
 void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -298,8 +304,11 @@ void GESScene::pasteObj() {
 	QList<QGraphicsItem*> list;
 	QByteArray bt;
 	bt = QApplication::clipboard()->mimeData()->data("graphics_Redactor/items");
-	openFromByte(list, bt);
-	addItemCommand* command = new addItemCommand(toGraph(list), mGraph);
+	GESFileLoader loader;
+	Graph* pasteGr = new Graph();
+	if( !loader.load( pasteGr, bt ) )
+		loader.showError();
+	addItemCommand* command = new addItemCommand(pasteGr, mGraph);
 	stackCommand->push(command);
 }
 
@@ -347,96 +356,6 @@ void GESScene::saveToByte(QList<QGraphicsItem*>& itemsList, QByteArray& bt) {
 	stream.writeEndElement();
 	stream.writeEndDocument();
 	return;
-}
-
-bool GESScene::openFromByte(QList<QGraphicsItem*>& itemList, QByteArray& bt) {
-	QString errorStr;
-	int errorLine;
-	int errorColumn;
-
-	QDomDocument document;
-	if (!document.setContent(bt, &errorStr, &errorLine, &errorColumn)) {
-		QMessageBox::information(
-				0,
-				qAppName(),
-				tr(
-						"Error while opening this file.\nParse error at line %1, column %2:\n%3").arg(
-						errorLine).arg(errorColumn).arg(errorStr));
-		return false;
-	}
-
-	QDomElement root = document.documentElement();
-	if (root.tagName() != "GRAPH") {
-		QMessageBox::critical(0, tr("Error!"), tr("Error parsing XML-file!"),
-				QMessageBox::Close);
-		return false;
-	}
-	QMap<int, Node*> nodes;
-	QList<Edge*> edges;
-	QDomElement element = root.firstChildElement("node");
-	while (!element.isNull()) {
-		if (!parseNode(element, nodes)) {
-			QMessageBox::critical(0, tr("Error!"), tr("Error parsing node!"),
-					QMessageBox::Close);
-			return false;
-		}
-		element = element.nextSiblingElement("node");
-	}
-	element = root.firstChildElement("edge");
-	while (!element.isNull()) {
-		if (!parseEdge(element, nodes, edges)) {
-			QMessageBox::critical(0, tr("Error!"), tr("Error parsing edge!"),
-					QMessageBox::Close);
-			return false;
-		}
-		element = element.nextSiblingElement("edge");
-	}
-	foreach(Node* item, nodes)
-		itemList << item;
-	foreach(Edge* item, edges)
-		itemList << item;
-	return true;
-}
-
-bool GESScene::parseNode(QDomElement& node, QMap<int, Node*>& list) {
-	if (node.hasAttribute("text")) {
-		QString text = node.attribute("text");
-		if (node.hasAttribute("id")) {
-			QString id = node.attribute("id");
-			Node* nd = new Node(Parent);
-			nd->setText(text);
-			nd->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
-			list.insert(id.toInt(), nd);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool GESScene::parseEdge(QDomElement& edge, QMap<int, Node*>& list
-		, QList<Edge*>& edges) {
-	if (edge.hasAttribute("text")) {
-		QString text = edge.attribute("text");
-		if (edge.hasAttribute("idsource")) {
-			QString idsource = edge.attribute("idsource");
-			if (edge.hasAttribute("iddest")) {
-				QString iddest = edge.attribute("iddest");
-				int a = idsource.toInt();
-				int b = iddest.toInt();
-
-				if (list.contains(a) && list.contains(b)) {
-					Node* nd1 = list.value(a);
-					Node* nd2 = list.value(b);
-					Edge* ed = new Edge(nd1, nd2);
-					ed->setText(text);
-					edges << ed;
-					return true;
-				} else
-					return false;
-			}
-		}
-	}
-	return false;
 }
 
 void GESScene::undoCommand() {

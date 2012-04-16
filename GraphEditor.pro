@@ -39,7 +39,8 @@ SUBDIRS = src/
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/Graph.h \
+HEADERS += include/GESTag.h \
+    include/Graph.h \
     include/GESFileLoader.h \
     include/GESTabWidget.h \
     include/GESPage.h \

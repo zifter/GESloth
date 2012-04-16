@@ -12,6 +12,7 @@
 #include <QPixmap>
 
 class GESPage;
+class Graph;
 
 class GESTabWidget: public QTabWidget {
 	Q_OBJECT
@@ -20,6 +21,7 @@ public:
 	~GESTabWidget();
 
 	void addPage();
+	void addPage( QString& name, Graph* );
 
 	QPixmap* getViewportPixmap();
 

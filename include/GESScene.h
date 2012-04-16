@@ -37,6 +37,8 @@ public:
 	//! Добавить объекты списка
 	void addItems(QList<QGraphicsItem*> list);
 
+	void setGraph( Graph* gr );
+
 public slots:
 	//! Установка состояния
 	void setState(State state);
@@ -75,9 +77,6 @@ public slots:
 
 	//! Сохраняет лист объектов в массив байтов в XML-формате
 	void saveToByte(QList<QGraphicsItem*>& itemList, QByteArray&);
-
-	//! Загружает из массива байтов в лист объекты
-	bool openFromByte(QList<QGraphicsItem*>&, QByteArray&);
 
 	//! Команда назад
 	void undoCommand();

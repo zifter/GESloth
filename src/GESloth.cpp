@@ -7,6 +7,7 @@
 #include "Macros.h"
 #include "HelpBrowser.h"
 #include "GESTabWidget.h"
+#include "GESFileLoader.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -365,8 +366,13 @@ void GESloth::switchOff(bool flagSwtch) {
 void GESloth::Open() {
 	QString FileName = QFileDialog::getOpenFileName(0, tr("Open graph"), "",
 			"*.grh");
-	NameOfFile = FileName;
-	openFromFile();
+
+	GESFileLoader loader;
+	Graph* graph = new Graph();
+	if( !loader.load( graph, FileName ) )
+		loader.showError();
+	tabWidget->addPage(FileName, graph );
+
 }
 
 void GESloth::Save() {
@@ -385,6 +391,8 @@ void GESloth::SaveAs() {
 }
 
 void GESloth::openFromFile() {
+
+
 /*	QFile fileIn(NameOfFile);
 
 	if (!fileIn.open(QFile::ReadOnly | QFile::Text))

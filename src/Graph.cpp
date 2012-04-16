@@ -14,6 +14,19 @@ Graph::Graph() : mScene(0) {
 Graph::~Graph() {
 }
 
+void Graph::setScene(GESScene* scn ){
+	mScene = scn;
+	foreach(Node* node, mNodes )
+	{
+		mScene->addItem( node );
+	}
+	foreach(Edge* edge, mEdges )
+	{
+		mScene->addItem( edge );
+	}
+}
+
+
 void Graph::add(Graph* gr) {
 	foreach(Edge* edge, gr->edges())
 	{
