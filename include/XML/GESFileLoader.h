@@ -20,46 +20,40 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+/*
+ * GESFileLoader.h
+ *
+ *  Created on: Apr 16, 2012
+ *      Author: zifter
+ */
 
-#include <QWidget>
+#ifndef GESFILELOADER_H_
+#define GESFILELOADER_H_
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#include "GESTag.h"
+#include "Graph/Graph.h"
+#include "Graph/Node.h"
+#include "Graph/Edge.h"
+#include <QByteArray>
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
-
+class GESFileLoader {
 public:
+	GESFileLoader();
+	~GESFileLoader();
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
+	bool load(Graph*& graph, const QString& name);
+	bool load(Graph*& graph, const QByteArray& bt);
 
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
+	void showError();
 
-public slots:
+protected:
+	bool parseNode(QDomElement& node, QMap<int, Node*>& list);
+	bool parseEdge(QDomElement& edge, QMap<int, Node*>& list
+			, QList<Edge*>& edges);
 
-    //! Установки имени
-    void updateWindowTitle();
+private	:
+	QString mErrorMessage;
 
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
 };
 
-#endif // HELPBROWSER_H
+#endif /* GESFILELOADER_H_ */

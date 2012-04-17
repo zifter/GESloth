@@ -20,46 +20,40 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+/*
+ * GrapgSettings.h
+ *
+ *  Created on: Apr 17, 2012
+ *      Author: zifter
+ */
 
-#include <QWidget>
+#ifndef PAGESETTINGS_H_
+#define PAGESETTINGS_H_
 
-class QPushButton;
-class QTextBrowser;
-class QString;
-
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
-
+class PageSettings {
 public:
+	PageSettings();
+	~PageSettings();
+	enum DrawState{
+		Node, Edge
+	};
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
+	void setState(DrawState st ){
+		mState = st;
+	}
+	DrawState getState() const{
+		return mState;
+	}
 
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
+	void setZoom( int _z ){
+		mZoom = _z;
+	}
+	int getZoom(){
+		return mZoom;
+	}
 
-public slots:
-
-    //! Установки имени
-    void updateWindowTitle();
-
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
+	DrawState mState;
+	int mZoom;
 };
 
-#endif // HELPBROWSER_H
+#endif /* PAGESETTINGS_H_ */

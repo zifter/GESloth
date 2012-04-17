@@ -20,46 +20,26 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+/*
+ * GESFileWriter.h
+ *
+ *  Created on: Apr 17, 2012
+ *      Author: zifter
+ */
 
-#include <QWidget>
+#ifndef GESFILEWRITER_H_
+#define GESFILEWRITER_H_
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#include <QByteArray>
+#include "Graph/Graph.h"
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
-
+class GESFileWriter {
 public:
+	GESFileWriter();
+	~GESFileWriter();
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
-
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
-
-public slots:
-
-    //! Установки имени
-    void updateWindowTitle();
-
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
+	void write( Graph* graph, QString name );
+	QByteArray& writeToByte( Graph* graph );
 };
 
-#endif // HELPBROWSER_H
+#endif /* GESFILEWRITER_H_ */

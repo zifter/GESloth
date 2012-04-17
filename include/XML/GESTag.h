@@ -20,46 +20,29 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+/*
+ * GESTag.h
+ *
+ *  Created on: Apr 16, 2012
+ *      Author: zifter
+ */
 
-#include <QWidget>
+#ifndef GESTAG_H_
+#define GESTAG_H_
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#include <QString>
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
+namespace tag {
+	const QString XML_GRAPH("GRAPH");
+	const QString XML_EDGE("edge");
+	const QString XML_NODE("node");
+}
 
-public:
+namespace attr {
+	const QString XML_TEXT("text");
+	const QString XML_ID("id");
+	const QString XML_ID_SOURCE("idsource");
+	const QString XML_ID_DEST("iddest");
+}
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
-
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
-
-public slots:
-
-    //! Установки имени
-    void updateWindowTitle();
-
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
-};
-
-#endif // HELPBROWSER_H
+#endif /* GESTAG_H_ */

@@ -20,46 +20,25 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+#include "Gui/Command.h"
 
-#include <QWidget>
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
 
-class QPushButton;
-class QTextBrowser;
-class QString;
-
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
+void addItemCommand::undo()
 {
-    Q_OBJECT
+	mGraph->remove(change);
+}
 
-public:
+void addItemCommand::redo() {
+	mGraph->add(change);
+}
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
+void delItemCommand::redo()
+{
+	mGraph->remove(change);
+}
 
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
-
-public slots:
-
-    //! Установки имени
-    void updateWindowTitle();
-
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
-};
-
-#endif // HELPBROWSER_H
+void delItemCommand::undo() {
+	mGraph->add(change);
+}

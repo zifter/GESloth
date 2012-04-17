@@ -20,46 +20,49 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+#ifndef OBJECT_H
+#define OBJECT_H
 
-#include <QWidget>
+#include <QGraphicsItem>
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#ifndef NULL
+#define NULL   ((void *) 0)
+#endif
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
+class Object : public QGraphicsItem
 {
-    Q_OBJECT
-
 public:
+    Object();
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
+    //! Виртуальная функция удаления
+    virtual void del(){};
 
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
+    //! Установить объект
+    void setText(QString _txt)
+    {
+    	text = _txt;
+        if(_txt.length()>15)
+        	short_text = _txt.replace(15, _txt.length()-15, QString("~"));
+        else
+        	short_text = _txt;
+    };
 
-public slots:
+    //! Получить текст объекта
+    QString getShortText() const {
+        return short_text;
+    };
 
-    //! Установки имени
-    void updateWindowTitle();
+    //! Получить текст объекта
+    QString getText() const {
+        return text;
+    };
 
 private:
+    //! Текст
+    QString text;
 
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
+    //!
+    QString short_text;
 };
 
-#endif // HELPBROWSER_H
+#endif // OBJECT_H

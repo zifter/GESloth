@@ -20,46 +20,23 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+#ifndef MACROS_H
+#define MACROS_H
 
-#include <QWidget>
+#include <QDebug>
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#ifndef DEBUG
+    #define IS_DEBUG false
+    #define PRINT(x)
+#else
+    #define IS_DEBUG true
+    #define PRINT(x) 	qDebug() << "\n"<< x; \
+                        qDebug() << "     line:" << __LINE__ << ", function:" << __FUNCTION__ << ", file:" << __FILE__;
+#endif
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
+#define DELETE(x) delete x;\
+                  x = NULL;
+// пытаемся объявить массив и из -1 при ошибке или из 1, если все хорошо
+#define STATIC_ASSERT(COND,MSG) typedef char static_assertion_##MSG[(!!(COND))*2-1];
 
-public:
-
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
-
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
-
-public slots:
-
-    //! Установки имени
-    void updateWindowTitle();
-
-private:
-
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
-
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
-
-    //! Кнопка назад
-    QPushButton *backButton;
-
-    //! Кнопка закрытия
-    QPushButton *closeButton;
-};
-
-#endif // HELPBROWSER_H
+#endif // MACROS_H

@@ -20,46 +20,59 @@
  **
  ****************************************************************************/
 
-#ifndef HELPBROWSER_H
-#define HELPBROWSER_H
+/*
+ * GESTabWidget.h
+ *
+ *  Created on: Apr 16, 2012
+ *      Author: zifter
+ */
 
-#include <QWidget>
+#ifndef GESTABWIDGET_H_
+#define GESTABWIDGET_H_
 
-class QPushButton;
-class QTextBrowser;
-class QString;
+#include <QTabWidget>
+#include <QPixmap>
 
-//! Виджет контекстной помощи
-class HelpBrowser : public QWidget
-{
-    Q_OBJECT
+#include "Gui/GESPage.h"
 
+class Graph;
+class GESloth;
+
+class GESTabWidget: public QTabWidget {
+Q_OBJECT
 public:
+	GESTabWidget( );
+	~GESTabWidget();
 
-    //! Конструктор
-    HelpBrowser(const QString &path, const QString &page);
+	void addPage();
+	void addPage(QString& name, Graph*);
+	void removePage(int index);
 
-    //! Метод, с помощью которого создается виджет
-    static void showPage(const QString &page);
+	QImage* getSceneImage();
+
+	GESPage* getCurrentPage();
 
 public slots:
 
-    //! Установки имени
-    void updateWindowTitle();
+	void setScale(const QString&);
 
-private:
+	void setSceneState(int st);
 
-    //! Просмоторщик текста
-    QTextBrowser *textBrowser;
+	void selectAll();
 
-    //! Кнопка вернуться на главную страницу
-    QPushButton *homeButton;
+	void copyObj();
 
-    //! Кнопка назад
-    QPushButton *backButton;
+	void pasteObj();
 
-    //! Кнопка закрытия
-    QPushButton *closeButton;
+	void redoCommand();
+
+	void undoCommand();
+
+	void deleteSelectedObj();
+
+	void cutObj();
+
+	void clear();
 };
 
-#endif // HELPBROWSER_H
+#endif /* GESTABWIDGET_H_ */
