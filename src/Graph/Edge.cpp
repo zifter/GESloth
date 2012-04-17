@@ -41,8 +41,8 @@
 
 #include <QPainter>
 
-#include "Edge.h"
-#include "Node.h"
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
 
 #include <math.h>
 

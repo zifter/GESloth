@@ -5,7 +5,7 @@
  *      Author: zifter
  */
 
-#include "Graph.h"
+#include "Graph/Graph.h"
 #include "Macros.h"
 Graph::Graph() :
 		mScene(0) {

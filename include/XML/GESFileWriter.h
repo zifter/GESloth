@@ -9,7 +9,7 @@
 #define GESFILEWRITER_H_
 
 #include <QByteArray>
-#include "Graph.h"
+#include "Graph/Graph.h"
 
 class GESFileWriter {
 public:

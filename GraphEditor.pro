@@ -33,45 +33,46 @@ else {
 INCLUDEPATH = include/
 
 # Set source path
-SUBDIRS = src/
+SUBDIRS = src/ \
+    src/Graph \
+    src/Gui
 
 # Set folder for media and resource
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/PageSettings.h \
-    include/GESFileWriter.h \
-    include/GESTag.h \
-    include/Graph.h \
-    include/GESFileLoader.h \
-    include/GESTabWidget.h \
-    include/GESPage.h \
+HEADERS += include/Gui/Command.h \
+    include/Gui/PageSettings.h \
+    include/XML/GESFileLoader.h \
+    include/XML/GESFileWriter.h \
+    include/XML/GESTag.h \
+    include/Gui/GESPage.h \
+    include/Gui/GESScene.h \
+    include/Gui/GESTabWidget.h \
+    include/Gui/GESView.h \
+    include/Gui/GESloth.h \
     include/Macros.h \
-    include/GESView.h \
-    include/Object.h \
-    include/Node.h \
     include/HelpBrowser.h \
-    include/GESloth.h \
-    include/Command.h \
-    include/GESScene.h \
-    include/Edge.h
+    include/Graph/Edge.h \
+    include/Graph/Node.h \
+    include/Graph/Graph.h \
+    include/Graph/Object.h
 
 # Set source
-SOURCES += src/PageSettings.cpp \
-    src/GESTag.cpp \
-    include/GESFileWriter.cpp \
-    src/Graph.cpp \
-    src/GESFileLoader.cpp \
-    src/GESTabWidget.cpp \
-    src/GESPage.cpp \
-    src/GESView.cpp \
-    src/Object.cpp \
-    src/Node.cpp \
+SOURCES += src/Gui/Command.cpp \
+    src/Gui/PageSettings.cpp \
+    src/XML/GESFileLoader.cpp \
+    src/XML/GESFileWriter.cpp \
+    src/Gui/GESPage.cpp \
+    src/Gui/GESScene.cpp \
+    src/Gui/GESTabWidget.cpp \
+    src/Gui/GESView.cpp \
+    src/Gui/GESloth.cpp \
     src/HelpBrowser.cpp \
-    src/GESloth.cpp \
-    src/Command.cpp \
-    src/GESScene.cpp \
-    src/Edge.cpp \
+    src/Graph/Edge.cpp \
+    src/Graph/Node.cpp \
+    src/Graph/Graph.cpp \
+    src/Graph/Object.cpp \
     src/main.cpp
 
 # Set translations

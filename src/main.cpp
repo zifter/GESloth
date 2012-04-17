@@ -1,7 +1,8 @@
 
 #include <QtGui>
 
-#include "GESloth.h"
+#include "Gui/GESloth.h"
+
 #include "Macros.h"
 
 int main(int argc, char **argv)

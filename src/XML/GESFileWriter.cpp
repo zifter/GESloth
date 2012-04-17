@@ -5,10 +5,12 @@
  *      Author: zifter
  */
 
-#include "GESFileWriter.h"
-#include "GESTag.h"
-#include "Edge.h"
-#include "Node.h"
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
+
+#include "XML/GESFileWriter.h"
+#include "XML/GESTag.h"
+
 #include "Macros.h"
 
 #include <QXmlStreamWriter>

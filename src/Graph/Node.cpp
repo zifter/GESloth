@@ -3,9 +3,11 @@
 #include <QPainter>
 #include <QStyleOption>
 
-#include "Edge.h"
-#include "Node.h"
-#include "GESloth.h"
+#include "Gui/GESloth.h"
+
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
+
 #include "Macros.h"
 
 Node::Node(GESloth *graphWidget) :

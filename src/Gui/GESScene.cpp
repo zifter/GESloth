@@ -22,14 +22,16 @@
 #include <QMessageBox>
 #include <QComboBox>
 
-#include "GESScene.h"
-#include "Command.h"
-#include "Node.h"
-#include "Edge.h"
+#include "Gui/GESScene.h"
+#include "Gui/GESPage.h"
+#include "Gui/Command.h"
+#include "Graph/Node.h"
+#include "Graph/Edge.h"
+
+#include "XML/GESFileLoader.h"
+#include "XML/GESFileWriter.h"
+
 #include "Macros.h"
-#include "GESFileLoader.h"
-#include "GESFileWriter.h"
-#include "GESPage.h"
 
 GESScene::GESScene(GESPage *prnt) :
 		mParentPage(prnt), line(NULL), point(NULL), menu(NULL) {

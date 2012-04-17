@@ -5,9 +5,10 @@
  *      Author: zifter
  */
 
-#include "GESTabWidget.h"
-#include "GESScene.h"
-#include "GESView.h"
+#include "Gui/GESTabWidget.h"
+#include "Gui/GESScene.h"
+#include "Gui/GESView.h"
+
 #include "Macros.h"
 
 GESTabWidget::GESTabWidget() {

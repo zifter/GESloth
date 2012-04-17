@@ -2,7 +2,7 @@
 #define EDGE_H
 
 #include <QGraphicsItem>
-#include "Object.h"
+#include "Graph/Object.h"
 
 class Node;
 

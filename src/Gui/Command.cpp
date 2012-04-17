@@ -1,7 +1,7 @@
-#include "Command.h"
-#include <QGraphicsItem>
-#include "Edge.h"
-#include "Node.h"
+#include "Gui/Command.h"
+
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
 
 void addItemCommand::undo()
 {

@@ -5,9 +5,10 @@
  *      Author: zifter
  */
 
-#include "GESView.h"
+#include "Gui/GESView.h"
+#include "Gui/GESPage.h"
+
 #include "Macros.h"
-#include "GESPage.h"
 
 GESView::GESView(GESPage* prnt ) :
 		isSceneRectControlled(false), mParentPage( prnt ){

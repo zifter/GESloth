@@ -1,14 +1,17 @@
-#include "GESloth.h"
-#include "Edge.h"
-#include "Node.h"
-#include "Object.h"
-#include "GESScene.h"
-#include "GESView.h"
+#include "Gui/GESloth.h"
+#include "Gui/GESScene.h"
+#include "Gui/GESView.h"
+#include "Gui/GESTabWidget.h"
+
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
+#include "Graph/Object.h"
+
 #include "Macros.h"
 #include "HelpBrowser.h"
-#include "GESTabWidget.h"
-#include "GESFileLoader.h"
-#include "GESFileWriter.h"
+
+#include "XML/GESFileLoader.h"
+#include "XML/GESFileWriter.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -39,7 +42,7 @@
 
 
 GESloth::GESloth(QApplication* app) :
-		timerId(0), mScaleFactorChange(25), minScaleFactor(25), maxScaleFactor(
+		timerId(0), mScaleFactorChange( 25 ), minScaleFactor(25), maxScaleFactor(
 				999) {
 	tabWidget = new GESTabWidget();
 

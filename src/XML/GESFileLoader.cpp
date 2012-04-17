@@ -5,7 +5,8 @@
  *      Author: zifter
  */
 
-#include "GESFileLoader.h"
+#include "XML/GESFileLoader.h"
+
 #include "Macros.h"
 
 #include <QApplication>

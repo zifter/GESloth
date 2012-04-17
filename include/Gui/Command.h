@@ -2,10 +2,12 @@
 #define COMMAND_H
 
 #include <QUndoCommand>
-#include "GESScene.h"
-#include "Object.h"
-#include "Node.h"
-#include "Graph.h"
+
+#include "Gui/GESScene.h"
+
+#include "Graph/Object.h"
+#include "Graph/Node.h"
+#include "Graph/Graph.h"
 
 class QGraphicsItem;
 

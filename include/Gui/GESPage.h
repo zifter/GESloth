@@ -11,7 +11,6 @@
 class GESScene;
 class GESView;
 
-#include "Object.h"
 #include <QWidget>
 #include "PageSettings.h"
 
@@ -20,9 +19,6 @@ class GESPage : public QWidget {
 public:
 	GESPage();
 	~GESPage();
-
-    //! Удалить объект
-    void delItem(Object* obj);
 
     //! Сцена
     GESScene* getScene(){
@@ -35,8 +31,8 @@ public:
     }
 
     //! Сцена
-    GESScene* setScene( GESScene* scn ){
-    	return mScene;
+    void setScene( GESScene* scn ){
+    	mScene = scn;
     }
 
     //! Просмоторщик

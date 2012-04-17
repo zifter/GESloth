@@ -9,9 +9,9 @@
 #define GESFILELOADER_H_
 
 #include "GESTag.h"
-#include "Graph.h"
-#include "Node.h"
-#include "Edge.h"
+#include "Graph/Graph.h"
+#include "Graph/Node.h"
+#include "Graph/Edge.h"
 #include <QByteArray>
 
 class GESFileLoader {

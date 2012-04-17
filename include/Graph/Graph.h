@@ -11,10 +11,12 @@
 #include <QList>
 #include "Macros.h"
 
-#include "Edge.h"
-#include "Node.h"
-#include "Object.h"
-#include "GESScene.h"
+#include "Gui/GESScene.h"
+
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
+#include "Graph/Object.h"
+
 
 class Graph {
 public:

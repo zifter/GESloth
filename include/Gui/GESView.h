@@ -10,7 +10,7 @@
 #include <QGraphicsView>
 #include <QComboBox>
 #include <QWheelEvent>
-#include <GESScene.h>
+#include "Gui/GESScene.h"
 
 class GESPage;
 

@@ -5,9 +5,10 @@
  *      Author: zifter
  */
 
-#include "GESPage.h"
-#include "GESScene.h"
-#include "GESView.h"
+#include "Gui/GESPage.h"
+#include "Gui/GESScene.h"
+#include "Gui/GESView.h"
+
 #include <QHBoxLayout>
 
 GESPage::GESPage() : mFileName(""){
@@ -28,10 +29,10 @@ GESPage::GESPage() : mFileName(""){
 GESPage::~GESPage() {
 
 }
-
+/*
 void GESPage::delItem(Object* obj) {
 	mScene->removeItem(obj);
-}
+}*/
 
 void GESPage::sceneScaleChanged(const QString &scale) {
 	double newScale = scale.left(scale.indexOf(tr("%"))).toDouble() / 100.0;

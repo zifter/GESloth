@@ -11,7 +11,7 @@
 #include <QTabWidget>
 #include <QPixmap>
 
-#include "GESPage.h"
+#include "Gui/GESPage.h"
 
 class Graph;
 
