@@ -27,13 +27,17 @@
  *      Author: zifter
  */
 
+#include <QScrollBar>
+
 #include "Gui/GESView.h"
 #include "Gui/GESPage.h"
+#include "Gui/GESloth.h"
+#include "Gui/GESTabWidget.h"
 
 #include "Macros.h"
 
-GESView::GESView(GESPage* prnt ) :
-		isSceneRectControlled(false), mParentPage( prnt ){
+GESView::GESView(GESPage* prnt) :
+		QGraphicsView(prnt), isSceneRectControlled(false) {
 	setCacheMode(QGraphicsView::CacheBackground);
 	setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 	setRenderHint(QPainter::Antialiasing);
@@ -50,21 +54,66 @@ void GESView::setScene(GESScene* scene) {
 	connect(scene, SIGNAL(sceneRectChanged(const QRectF&)), this,
 			SLOT(updateSceneRect(const QRectF&)));
 }
-/*
+
+void GESView::mouseMoveEvent (QMouseEvent * event)
+{
+    if(event->buttons() & Qt::MidButton)
+    {
+        viewport()->setCursor(Qt::ClosedHandCursor);
+        QScrollBar *hBar = horizontalScrollBar();
+        QScrollBar *vBar = verticalScrollBar();
+        QPoint delta = event->pos() - mPrevMousePos;
+        hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
+        vBar->setValue(vBar->value() - delta.y());
+        mPrevMousePos = event->pos();
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+
+void GESView::mousePressEvent (QMouseEvent * event)
+{
+    if(event->button() == Qt::MidButton)
+    {
+        viewport()->setCursor(Qt::OpenHandCursor);
+        mPrevMousePos = event->pos();
+    }
+    else
+        QGraphicsView::mousePressEvent(event);
+}
+
+void GESView::mouseReleaseEvent (QMouseEvent * event)
+{
+    if(event->button() == Qt::MidButton)
+    {
+        viewport()->setCursor(Qt::ArrowCursor);
+        mPrevMousePos = event->pos();
+    }
+    else
+        QGraphicsView::mouseReleaseEvent(event);
+}
+
 void GESView::wheelEvent(QWheelEvent *event) {
-	if (event->delta() > 0) {
-		if (sceneScaleCombo->currentIndex() == 9)
-			return;
-		sceneScaleCombo->setCurrentIndex(sceneScaleCombo->currentIndex() + 1);
-	} else {
-		if (sceneScaleCombo->currentIndex() == 0)
-			return;
-		sceneScaleCombo->setCurrentIndex(sceneScaleCombo->currentIndex() - 1);
+	if (event->modifiers() == Qt::ControlModifier) {
+		GESPage* page = qobject_cast<GESPage*>(parent());
+		int zoom = page->getSettings()->getZoom();
+		if( event->delta() > 0 ){
+			zoom += GESloth::mScaleFactorChange;
+			if( zoom > GESloth::maxScaleFactor )
+				zoom = GESloth::maxScaleFactor;
+		}
+		else{
+			zoom -= GESloth::mScaleFactorChange;
+			if( zoom < GESloth::minScaleFactor )
+				zoom = GESloth::minScaleFactor;
+		}
+		page->getSettings()->setZoom( zoom );
+		emit QWidget::wheelEvent(event);
 	}
-
-	emit wheelEvent( event );
-
-}*/
+	else
+		emit QGraphicsView::wheelEvent( event );
+}
 
 void GESView::updateSceneRect(const QRectF& rect) {
 	if (!isSceneRectControlled && !sceneRect().contains(rect))
@@ -83,21 +132,18 @@ void GESView::updateSceneRect(const QRectF& rect) {
 	}
 }
 
-void GESView::setScale(const QString& sc)
-{
-    QTransform t = transform();
-    //Default transform
-    t.reset();
+void GESView::setScale(const QString& sc) {
+	QTransform t = transform();
+	//Default transform
+	t.reset();
 
-    //Getting percent value
-    QString str = sc;
-    str.remove("%");
-    double d = str.toDouble();
-    mParentPage->getSettings()->setZoom( d );
-    d /= 100;
+	//Getting percent value
+	QString str = sc;
+	str.remove("%");
+	double d = str.toDouble();
+	qobject_cast<GESPage*>(parent())->getSettings()->setZoom(d);
+	d /= 100;
 
-    //Setting transformation
-    setTransform(t.scale(d,d),false);
-
-    emit(scaleChanged(transform().mapRect(QRectF(0, 0, 1, 1)).width()));
+	//Setting transformation
+	setTransform(t.scale(d, d), false);
 }

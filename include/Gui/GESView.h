@@ -51,6 +51,11 @@ public:
 public slots:
 	//! Slot for scale changing. (The string must be smth like this: "123%")
 	void setScale(const QString& sc);
+	//! Wheel slot
+	void wheelEvent(QWheelEvent *event);
+	void mouseMoveEvent (QMouseEvent * event);
+	void mousePressEvent (QMouseEvent * event);
+	void mouseReleaseEvent (QMouseEvent * event);
 
 signals:
 	//! Emitted, when sceneRect, visualized by this view, was changed.
@@ -59,15 +64,13 @@ signals:
     void scaleChanged(qreal newScaleFactor);
 
 protected:
-    //! Колесико
-  //  void wheelEvent(QWheelEvent *event);
-
     bool isSceneRectControlled;
+
+    //! Previous mouse position for scrolling by mid mouse button click.
+    QPoint mPrevMousePos;
 
 private slots:
 	void updateSceneRect(const QRectF& rect);
 
-private:
-	GESPage* mParentPage;
 };
 #endif /* GESVIEW_H_ */

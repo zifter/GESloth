@@ -20,21 +20,6 @@
  **
  ****************************************************************************/
 
-#include "Gui/GESloth.h"
-#include "Gui/GESScene.h"
-#include "Gui/GESView.h"
-#include "Gui/GESTabWidget.h"
-
-#include "Graph/Edge.h"
-#include "Graph/Node.h"
-#include "Graph/Object.h"
-
-#include "Macros.h"
-#include "HelpBrowser.h"
-
-#include "XML/GESFileLoader.h"
-#include "XML/GESFileWriter.h"
-
 #include <QApplication>
 #include <QDebug>
 #include <QGraphicsScene>
@@ -62,11 +47,27 @@
 #include <QStringList>
 #include <QList>
 
+#include "Gui/GESloth.h"
+#include "Gui/GESScene.h"
+#include "Gui/GESView.h"
+#include "Gui/GESTabWidget.h"
 
-GESloth::GESloth(QApplication* app) :
-		timerId(0), mScaleFactorChange( 25 ), minScaleFactor(25), maxScaleFactor(
-				999) {
-	tabWidget = new GESTabWidget();
+#include "Graph/Edge.h"
+#include "Graph/Node.h"
+#include "Graph/Object.h"
+
+#include "Macros.h"
+#include "HelpBrowser.h"
+
+#include "XML/GESFileLoader.h"
+#include "XML/GESFileWriter.h"
+
+const int GESloth::mScaleFactorChange = 25;
+const int GESloth::minScaleFactor = 25;
+const int GESloth::maxScaleFactor = 999;
+
+GESloth::GESloth(QApplication* app) {
+	tabWidget = new GESTabWidget( );
 
 	setMinimumSize(450, 450);
 	setWindowTitle(tr("Graph Editor Sloth"));
@@ -76,29 +77,12 @@ GESloth::GESloth(QApplication* app) :
 	createAction();
 	createMenus();
 
-	connect(tabWidget, SIGNAL( currentChanged ( int ) ), this, SLOT( changeTab(int) ) );
-	connect(tabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab(int) ) );
+	connect(tabWidget, SIGNAL( currentChanged ( int ) ), this,
+			SLOT( changeTab(int) ));
+	connect(tabWidget, SIGNAL( tabCloseRequested ( int ) ), this,
+			SLOT( closeTab(int) ));
 
 }
-
-void GESloth::itemMoved() {
-	//if (!timerId)
-		//timerId = startTimer(1000 / 25);
-}
-
-void GESloth::keyPressEvent(QKeyEvent *event) {
-	/*switch (event->key()) {
-	case Qt::Key_Space:
-		foreach (QGraphicsItem *item, scene->items())
-			if (qgraphicsitem_cast<Node *>(item))
-				item->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
-		break;
-	}
-	QMainWindow::keyPressEvent(event);*/
-}
-
-
-
 
 void GESloth::createToolBar() {
 	pointerTypeGroup = new QButtonGroup;
@@ -157,7 +141,9 @@ void GESloth::createMenus() {
 	menuEdit->addAction(mActionUndo);
 
 	// about
-	QAction* action = new QAction(QIcon::fromTheme("help-about", getIcon("about")), tr("About... "), this);
+	QAction* action = new QAction(
+			QIcon::fromTheme("help-about", getIcon("about")), tr("About... "),
+			this);
 	action->setCheckable(false);
 	action->setStatusTip(tr("Show some little info about this program"));
 	action->setIconVisibleInMenu(true);
@@ -173,7 +159,8 @@ void GESloth::createMenus() {
 	menuHelp->addAction(action);
 
 	// new
-	action = new QAction(QIcon::fromTheme("document-new", getIcon("new")), tr("New..."), this);
+	action = new QAction(QIcon::fromTheme("document-new", getIcon("new")),
+			tr("New..."), this);
 	action->setShortcut(QKeySequence::New);
 	action->setIconVisibleInMenu(true);
 	action->setCheckable(false);
@@ -182,7 +169,8 @@ void GESloth::createMenus() {
 	menuFile->addAction(action);
 
 	// open
-	action = new QAction(QIcon::fromTheme("document-open", getIcon("open")), tr("Open..."), this);
+	action = new QAction(QIcon::fromTheme("document-open", getIcon("open")),
+			tr("Open..."), this);
 	action->setShortcut(QKeySequence::Open);
 	action->setIconVisibleInMenu(true);
 	action->setCheckable(false);
@@ -191,7 +179,8 @@ void GESloth::createMenus() {
 	menuFile->addAction(action);
 
 	// save
-	action = new QAction(QIcon::fromTheme("document-save", getIcon("save")), tr("Save..."), this);
+	action = new QAction(QIcon::fromTheme("document-save", getIcon("save")),
+			tr("Save..."), this);
 	action->setShortcut(QKeySequence::Save);
 	action->setIconVisibleInMenu(true);
 	action->setCheckable(false);
@@ -200,7 +189,9 @@ void GESloth::createMenus() {
 	menuFile->addAction(action);
 
 	// save as
-	action = new QAction(QIcon::fromTheme("document-save-as", getIcon("saveAs")),tr("Save as..."), this);
+	action = new QAction(
+			QIcon::fromTheme("document-save-as", getIcon("saveAs")),
+			tr("Save as..."), this);
 	action->setShortcut(QKeySequence::SaveAs);
 	action->setCheckable(false);
 	action->setStatusTip(tr("Save file as"));
@@ -211,7 +202,8 @@ void GESloth::createMenus() {
 	menuFile->addSeparator();
 
 	// export
-	action = new QAction(QIcon::fromTheme("insert-image", getIcon("export")), tr("Export..."), this);
+	action = new QAction(QIcon::fromTheme("insert-image", getIcon("export")),
+			tr("Export..."), this);
 	action->setCheckable(false);
 	action->setStatusTip(tr("Export file to image"));
 	action->setIconVisibleInMenu(true);
@@ -219,7 +211,9 @@ void GESloth::createMenus() {
 	menuFile->addAction(action);
 
 	QMenu* translateMenu = new QMenu(tr("Translation"));
-	translateMenu->setIcon( QIcon::fromTheme("preferences-desktop-locale", getIcon("translate")));
+	translateMenu->setIcon(
+			QIcon::fromTheme("preferences-desktop-locale",
+					getIcon("translate")));
 	QActionGroup* languageActionGroup = new QActionGroup(this);
 	connect(languageActionGroup, SIGNAL(triggered(QAction *)), this,
 			SLOT(switchLang(QAction *)));
@@ -249,7 +243,8 @@ void GESloth::createMenus() {
 	menuFile->addSeparator();
 
 	// close
-	action = new QAction(QIcon::fromTheme("window-close", getIcon("close")), tr("Close..."), this);
+	action = new QAction(QIcon::fromTheme("window-close", getIcon("close")),
+			tr("Close..."), this);
 	action->setShortcut(QKeySequence::Close);
 	action->setCheckable(false);
 	action->setStatusTip(tr("Exit from program"));
@@ -262,12 +257,15 @@ void GESloth::createAction() {
 	QAction* action;
 
 	mToolBar->addSeparator();
-    mToolBar->setIconSize(QSize(42, 32));
+	mToolBar->setIconSize(QSize(42, 32));
 
 	//Scale combobox
 	QComboBox* b = new QComboBox(mToolBar);
 	b->setEditable(true);
-	b->setFixedWidth( 62 );
+	b->setFixedWidth(70);
+	QFont* font = new QFont();
+	font->setPointSize(10);
+	b->setFont(*font);
 	b->setInsertPolicy(QComboBox::NoInsert);
 	QList<QString> scales;
 	scales << "25%" << "50%" << "75%" << "100%" << "125%" << "150%" << "175%"
@@ -280,8 +278,6 @@ void GESloth::createAction() {
 	mToolBar->addWidget(b);
 	connect(mZoomFactorLine, SIGNAL( textChanged(const QString&)), tabWidget,
 			SLOT(setScale(const QString&)));
-	connect(tabWidget, SIGNAL(scaleChanged(qreal)), this,
-			SLOT(viewScaleChanged(qreal)));
 
 	//Zoom out
 	action = new QAction(QIcon::fromTheme("zoom-out", getIcon("zoomOut")),
@@ -306,7 +302,8 @@ void GESloth::createAction() {
 	mActionSelectAll->setShortcut(QKeySequence::SelectAll);
 	mActionSelectAll->setIconVisibleInMenu(true);
 	mActionSelectAll->setStatusTip("Select all items");
-	connect(mActionSelectAll, SIGNAL(triggered()), tabWidget, SLOT(selectAll()));
+	connect(mActionSelectAll, SIGNAL(triggered()), tabWidget,
+			SLOT(selectAll()));
 
 	// copy
 	mActionCopy = new QAction(QIcon::fromTheme("edit-copy", getIcon("copy")),
@@ -351,14 +348,12 @@ void GESloth::createAction() {
 			SLOT(deleteSelectedObj()));
 
 	// clear
-	mActionClear = new QAction(
-			QIcon::fromTheme("edit-clear", getIcon("clear")), tr("Clear..."),
-			this);
+	mActionClear = new QAction(QIcon::fromTheme("edit-clear", getIcon("clear")),
+			tr("Clear..."), this);
 	mActionClear->setShortcut(QKeySequence::Refresh);
 	mActionClear->setIconVisibleInMenu(true);
 	mActionClear->setStatusTip("Clear page");
-	connect(mActionClear, SIGNAL(triggered()), tabWidget,
-			SLOT(clear()));
+	connect(mActionClear, SIGNAL(triggered()), tabWidget, SLOT(clear()));
 
 	// cut
 	mActionCut = new QAction(QIcon::fromTheme("edit-cut", getIcon("cut")),
@@ -381,7 +376,7 @@ void GESloth::exportToImage() {
 //
 //	if (!fileName.isEmpty())
 //		QPixmap::grabWidget(mView->viewport()).save(fileName, "png");
-	tabWidget->getViewportPixmap()->save("asd","png");
+	tabWidget->getViewportPixmap()->save("asd", "png");
 }
 
 void GESloth::aboutQt() {
@@ -397,48 +392,46 @@ void GESloth::about() {
 							"The <b>Graph Redactor</b> is laba for Oleg Strokachuk. <br/>Intended to build a directed graph with the possibility of pseudo-physics interaction ")));
 }
 
-
-
 void GESloth::switchOff(bool flagSwtch) {
-	if (flagSwtch)
-		timerId = startTimer(1000 / 25);
-	else
-		killTimer(timerId);
+	//if (flagSwtch)
+	//	timerId = startTimer(1000 / 25);
+	//else
+	//	killTimer(timerId);
 }
 
 void GESloth::Open() {
 	QString FileName = QFileDialog::getOpenFileName(0, tr("Open graph"), "",
 			"*.grh");
 
-	if( FileName == "" )
+	if (FileName == "")
 		return;
 
 	GESFileLoader loader;
 	Graph* graph = new Graph();
-	if( !loader.load( graph, FileName ) )
+	if (!loader.load(graph, FileName))
 		loader.showError();
-	tabWidget->addPage(FileName, graph );
+	tabWidget->addPage(FileName, graph);
 
 }
 
 void GESloth::Save() {
 	GESPage* page = tabWidget->getCurrentPage();
-	if (page->getFileName() == "" ) {
+	if (page->getFileName() == "") {
 		SaveAs();
 		return;
 	}
 	GESFileWriter writer;
-	writer.write( page->getScene()->getGraph(), page->getFileName() );
+	writer.write(page->getScene()->getGraph(), page->getFileName());
 }
 
 void GESloth::SaveAs() {
 	GESPage* page = tabWidget->getCurrentPage();
 	QString FileName = QFileDialog::getSaveFileName(0, tr("Save graph"), "",
 			"*.grh");
-	if( FileName == "" )
+	if (FileName == "")
 		return;
 	GESFileWriter writer;
-	writer.write( page->getScene()->getGraph(), FileName );
+	writer.write(page->getScene()->getGraph(), FileName);
 }
 
 void GESloth::switchLang(QAction* act) {
@@ -460,14 +453,14 @@ QIcon GESloth::getIcon(const QString& name) {
 	return QIcon(":/image/" + name);
 }
 
-void GESloth::newPage(){
+void GESloth::newPage() {
 	tabWidget->addPage();
 }
 
-void GESloth::viewScaleChanged(qreal newScale) {
-	qreal oldScale = mZoomFactorLine->text().remove('%').toDouble() / 100;
+void GESloth::viewScaleChanged(int newScale) {
+	qreal oldScale = mZoomFactorLine->text().remove('%').toInt();
 	if (newScale != oldScale)
-		mZoomFactorLine->setText(QString::number(int(newScale * 100)));
+		mZoomFactorLine->setText(QString::number( newScale));
 }
 
 void GESloth::zoomIn() {
@@ -475,32 +468,36 @@ void GESloth::zoomIn() {
 	qint32 newScale = oldScale - mScaleFactorChange;
 	if (newScale < minScaleFactor)
 		newScale = minScaleFactor;
-
 	mZoomFactorLine->setText(QString::number(newScale));
 }
 
 void GESloth::zoomOut() {
 	qint32 oldScale = mZoomFactorLine->text().remove('%').toInt();
 	qint32 newScale = oldScale + mScaleFactorChange;
-
 	if (newScale > maxScaleFactor)
 		newScale = maxScaleFactor;
-
 	mZoomFactorLine->setText(QString::number(newScale));
 }
 
-void GESloth::closeTab( int index ){
-	tabWidget->removeTab( index );
+void GESloth::closeTab(int index) {
+	tabWidget->removeTab(index);
 }
 
-void GESloth::changeTab( int ){
+void GESloth::changeTab(int) {
 	GESPage* page = tabWidget->getCurrentPage();
-	if( page != 0 )
+	if (page != 0)
 		loadSettings(page->getSettings());
 }
 
-void GESloth::loadSettings( PageSettings* set ){
-	pointerTypeGroup->button((int)set->getState())->setChecked(true);
+void GESloth::loadSettings(PageSettings* set) {
+	pointerTypeGroup->button((int) set->getState())->setChecked(true);
 	mZoomFactorLine->setText(QString::number(set->getZoom()));
+}
+
+void GESloth::wheelEvent( QWheelEvent* event ){
+	if (event->modifiers() == Qt::ControlModifier) {
+		mZoomFactorLine->setText(QString::number(tabWidget->getCurrentPage()->getSettings()->getZoom()));
+	} else
+		emit QWidget::wheelEvent(event);
 }
 

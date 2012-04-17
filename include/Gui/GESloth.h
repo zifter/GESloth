@@ -44,6 +44,7 @@ class GESTabWidget;
 class QLineEdit;
 class GESScene;
 class GESView;
+class WheelEvent;
 
 class GESloth : public QMainWindow
 {
@@ -53,15 +54,19 @@ public:
     GESloth(QApplication*);
     virtual ~GESloth(){};
 
-    //! Объекты нуждаються в передвижении
-    void itemMoved();
+    //! Default scale factor
+    static const int mScaleFactorChange;
+
+    // ! Minimun scale factor
+    static const int minScaleFactor;
+
+    // ! Maximum scale factor
+    static const int maxScaleFactor;
+
+protected:
 
     //! Создание менюшек
     void createMenus();
-
-protected:
-    //! Событие нажатия каких либо клавиш
-    void keyPressEvent(QKeyEvent *event);
 
     //! Создание панели инструментов
     void createToolBar();
@@ -72,8 +77,12 @@ protected:
     //! return icon path
     QIcon getIcon(const QString& name );
 
-private slots:
+    //! Load page settings. Change checked button, zoom an etc
+	void loadSettings( PageSettings* set );
 
+	void wheelEvent( QWheelEvent* event );
+
+private slots:
     //! Экспортировка в изображение
     void exportToImage();
 
@@ -109,7 +118,7 @@ private slots:
 	/**
 	 *	@brief Method for change view scale
 	 */
-    void viewScaleChanged(qreal);
+    void viewScaleChanged(int);
 
 	/**
 	 * @breif Method for change scale factor
@@ -128,19 +137,11 @@ private slots:
 
 private:
 
-	void loadSettings( PageSettings* set );
-
 	//! Tab widget
     GESTabWidget* tabWidget;
 
     //! Contents current zoom factor.
     QLineEdit* mZoomFactorLine;
-
-    //! Default scale factor
-    qint32 mScaleFactorChange;
-
-    //! Индификатор таймера
-    int timerId;
 
     //! Группа кнопок
     QButtonGroup *pointerTypeGroup;
@@ -151,6 +152,7 @@ private:
     //! Имя файла
     QString NameOfFile;
 
+    //! Action
     QAction* mActionCut;
     QAction* mActionPaste;
     QAction* mActionCopy;
@@ -160,11 +162,6 @@ private:
 	QAction* mActionClear;
     QAction* mActionSelectAll;
 
-    // ! Minimun scale factor
-    qint32 minScaleFactor;
-
-    // ! Maximum scale factor
-    qint32 maxScaleFactor;
 };
 
 #endif

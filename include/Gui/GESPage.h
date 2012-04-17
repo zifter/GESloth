@@ -32,6 +32,7 @@
 
 class GESScene;
 class GESView;
+class GESTabWidget;
 
 #include <QWidget>
 #include "PageSettings.h"
@@ -39,7 +40,7 @@ class GESView;
 class GESPage : public QWidget {
 	Q_OBJECT
 public:
-	GESPage();
+	GESPage( GESTabWidget* prnt );
 	~GESPage();
 
     //! Сцена

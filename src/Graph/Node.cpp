@@ -210,7 +210,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value) {
 			edge->adjust();
 		foreach (Edge *edge, OutEdgeList)
 			edge->adjust();
-		graph->itemMoved();
+		//graph->itemMoved();
 		break;
 	default:
 		break;

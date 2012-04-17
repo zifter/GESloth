@@ -56,7 +56,7 @@
 #include "Macros.h"
 
 GESScene::GESScene(GESPage *prnt) :
-		mParentPage(prnt), line(NULL), point(NULL), menu(NULL) {
+		QGraphicsScene(prnt), line(NULL), point(NULL), menu(NULL) {
 	QPainterPath path;
 	mGraph = new Graph();
 	mGraph->setScene( this );
@@ -65,7 +65,7 @@ GESScene::GESScene(GESPage *prnt) :
 }
 
 void GESScene::setState(PageSettings::DrawState state){
-	mParentPage->getSettings()->setState(state);
+	qobject_cast<GESPage*>(parent())->getSettings()->setState(state);
 	mState = state;
 	bool movable = ( mState != PageSettings::Edge );
 	foreach (Node *node, mGraph->nodes() )

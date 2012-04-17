@@ -27,13 +27,14 @@
  *      Author: zifter
  */
 
+#include <QHBoxLayout>
+
 #include "Gui/GESPage.h"
 #include "Gui/GESScene.h"
 #include "Gui/GESView.h"
+#include "Gui/GESTabWidget.h"
 
-#include <QHBoxLayout>
-
-GESPage::GESPage() : mFileName(""){
+GESPage::GESPage( GESTabWidget* prnt ) : QWidget( prnt ), mFileName(""){
 	mSettings = new PageSettings();
 	mScene = new GESScene(this);
 	mScene->setItemIndexMethod(QGraphicsScene::NoIndex);

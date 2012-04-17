@@ -32,8 +32,7 @@
 #include "Gui/GESView.h"
 
 #include "Macros.h"
-
-GESTabWidget::GESTabWidget() {
+GESTabWidget::GESTabWidget( )  {
 	setTabsClosable( true );
 }
 
@@ -41,11 +40,11 @@ GESTabWidget::~GESTabWidget() {
 }
 
 void GESTabWidget::addPage(){
-	addTab(new GESPage(), tr("New page"));
+	addTab(new GESPage( this ), tr("New page"));
 }
 
 void GESTabWidget::addPage( QString& name, Graph* graph ){
-	GESPage* page = new GESPage( );
+	GESPage* page = new GESPage( this );
 	page->setFileName( name );
 	page->getScene()->setGraph( graph );
 	addTab( page, name );

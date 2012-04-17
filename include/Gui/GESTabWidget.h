@@ -36,25 +36,31 @@
 #include "Gui/GESPage.h"
 
 class Graph;
+class GESloth;
 
 class GESTabWidget: public QTabWidget {
-	Q_OBJECT
+Q_OBJECT
 public:
-	GESTabWidget();
+	GESTabWidget( );
 	~GESTabWidget();
 
 	void addPage();
-	void addPage( QString& name, Graph* );
+	void addPage(QString& name, Graph*);
 
 	QPixmap* getViewportPixmap();
 
 	GESPage* getCurrentPage();
 
+	void emitViewScaleChanged( int fac ){
+
+		emit viewScaleChanged( fac );
+	}
+
 public slots:
 
 	void setScale(const QString&);
 
-	void setSceneState( int st );
+	void setSceneState(int st);
 
 	void selectAll();
 
@@ -73,8 +79,7 @@ public slots:
 	void clear();
 
 signals:
-	void scaleChanged(qreal);
-
+	void viewScaleChanged( int );
 };
 
 #endif /* GESTABWIDGET_H_ */

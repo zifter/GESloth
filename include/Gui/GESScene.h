@@ -119,9 +119,6 @@ private:
 	//! Graph which contains on scene
 	Graph* mGraph;
 
-	//! Родитель
-	GESPage* mParentPage;
-
 	//! Линия
 	QGraphicsLineItem *line;
 
