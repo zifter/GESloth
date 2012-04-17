@@ -53,9 +53,13 @@ public:
 	virtual ~GESScene();
 
 	void setGraph(Graph* gr);
+
 	Graph* getGraph() const {
 		return mGraph;
 	}
+
+	void add( Edge* );
+	void add( Node* );
 
 	void renderToImage(QPainter *painter, const QRectF &target, const QRectF &source);
 

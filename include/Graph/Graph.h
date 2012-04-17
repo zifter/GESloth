@@ -51,14 +51,14 @@ public:
 	void add( Node* nd) {
 		mNodes << nd;
 		if( mScene != 0 )
-			mScene->addItem( nd );
+			mScene->add( nd );
 	}
 
 	//! Add edge in graph
 	void add(Edge* dg) {
 		mEdges << dg;
 		if( mScene != 0 )
-			mScene->addItem( dg );
+			mScene->add( dg );
 	}
 
 	//! Add another graph

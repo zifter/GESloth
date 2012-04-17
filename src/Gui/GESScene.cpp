@@ -72,15 +72,23 @@ GESScene::~GESScene(){
 void GESScene::setState(PageSettings::DrawState state){
 	qobject_cast<GESPage*>(parent())->getSettings()->setState(state);
 	mState = state;
-	bool movable = ( mState != PageSettings::Edge );
 	foreach (Node *node, mGraph->nodes() )
-		node->setFlag(QGraphicsItem::ItemIsMovable, movable);
+		node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
 }
 
 void GESScene::setGraph( Graph* gr ){
 	mGraph = gr;
 	mGraph->setScene(this);
 }
+
+void GESScene::add( Edge* edge ){
+	addItem( edge );
+}
+void GESScene::add( Node* node ){
+	addItem( node );
+	node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
+}
+
 
 void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	QGraphicsScene::mousePressEvent(mouseEvent);
