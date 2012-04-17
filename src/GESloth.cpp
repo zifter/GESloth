@@ -43,13 +43,17 @@ GESloth::GESloth(QApplication* app) :
 				999) {
 	tabWidget = new GESTabWidget();
 
+	setMinimumSize(450, 450);
+	setWindowTitle(tr("Graph Editor Sloth"));
 	setCentralWidget(tabWidget);
+
 	createToolBar();
 	createAction();
 	createMenus();
 
-	setMinimumSize(450, 450);
-	setWindowTitle(tr("Graph Editor Sloth"));
+	connect(tabWidget, SIGNAL( currentChanged ( int ) ), this, SLOT( changeTab(int) ) );
+	connect(tabWidget, SIGNAL( tabCloseRequested ( int ) ), this, SLOT( closeTab(int) ) );
+
 }
 
 void GESloth::itemMoved() {
@@ -85,8 +89,8 @@ void GESloth::createToolBar() {
 	linePointerButton->setIcon(getIcon("linepointer"));
 	linePointerButton->setToolTip(tr("Edge mode"));
 
-	pointerTypeGroup->addButton(pointerButton, int(GESScene::InsertNode));
-	pointerTypeGroup->addButton(linePointerButton, int(GESScene::InsertEdge));
+	pointerTypeGroup->addButton(pointerButton, int(PageSettings::Node));
+	pointerTypeGroup->addButton(linePointerButton, int(PageSettings::Edge));
 	connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), tabWidget,
 			SLOT(setSceneState(int)));
 
@@ -233,10 +237,12 @@ void GESloth::createAction() {
 	QAction* action;
 
 	mToolBar->addSeparator();
+    mToolBar->setIconSize(QSize(42, 32));
 
 	//Scale combobox
 	QComboBox* b = new QComboBox(mToolBar);
 	b->setEditable(true);
+	b->setFixedWidth( 62 );
 	b->setInsertPolicy(QComboBox::NoInsert);
 	QList<QString> scales;
 	scales << "25%" << "50%" << "75%" << "100%" << "125%" << "150%" << "175%"
@@ -457,3 +463,19 @@ void GESloth::zoomOut() {
 
 	mZoomFactorLine->setText(QString::number(newScale));
 }
+
+void GESloth::closeTab( int index ){
+	tabWidget->removeTab( index );
+}
+
+void GESloth::changeTab( int ){
+	GESPage* page = tabWidget->getCurrentPage();
+	if( page != 0 )
+		loadSettings(page->getSettings());
+}
+
+void GESloth::loadSettings( PageSettings* set ){
+	pointerTypeGroup->button((int)set->getState())->setChecked(true);
+	mZoomFactorLine->setText(QString::number(set->getZoom()));
+}
+

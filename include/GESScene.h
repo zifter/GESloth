@@ -6,6 +6,8 @@
 #include <QMimeData>
 #include <QGraphicsView>
 
+#include "PageSettings.h"
+
 class GESloth;
 class Node;
 class Edge;
@@ -19,49 +21,35 @@ class QUndoStack;
 class QWheelEvent;
 class QComboBox;
 class Graph;
+class GESPage;
 
 class GESScene: public QGraphicsScene {
 Q_OBJECT
 
 public:
-	GESScene( GESloth* prnt = 0 );
+	GESScene(GESPage* prnt);
 	virtual ~GESScene() {
 	}
-	;
 
-	//! Возможные состояния системы
-	enum State {
-		InsertNode, InsertEdge
-	};
-
-	//! Добавить объекты списка
-	void addItems(QList<QGraphicsItem*> list);
-
-	void setGraph( Graph* gr );
-	Graph* getGraph() const{
+	void setGraph(Graph* gr);
+	Graph* getGraph() const {
 		return mGraph;
 	}
 
 public slots:
 	//! Установка состояния
-	void setState(State state);
-
+	void setState(PageSettings::DrawState state);
+	/*
 	//! Получить состояние
 	State getState() {
 		return myState;
-	}
+	}*/
 
 	//! Удалить
 	void deleteSelectedObj();
 
 	//! Удалить
 	void deleteUnderMouseObj();
-
-	//! Удалить объекты списка
-	void deleteObj(QList<QGraphicsItem*> itemList);
-
-	//! Удалить объекты текущего списка
-	void deleteObj();
 
 	//! Установить имя
 	void setName();
@@ -104,16 +92,13 @@ protected:
 
 private:
 
-	Graph* toGraph( QList<QGraphicsItem*>& itemList );
-
-	//! Состояние
-	State myState;
+	Graph* toGraph(QList<QGraphicsItem*>& itemList);
 
 	//! Graph which contains on scene
 	Graph* mGraph;
 
 	//! Родитель
-	GESloth *Parent;
+	GESPage* mParentPage;
 
 	//! Линия
 	QGraphicsLineItem *line;
@@ -123,6 +108,8 @@ private:
 
 	//! Меню
 	QMenu *menu;
+
+	PageSettings::DrawState mState;
 
 	//! Текущий элемент
 	QGraphicsItem* currentItem;

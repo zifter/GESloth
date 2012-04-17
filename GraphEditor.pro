@@ -39,7 +39,8 @@ SUBDIRS = src/
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/GESFileWriter.h \
+HEADERS += include/PageSettings.h \
+    include/GESFileWriter.h \
     include/GESTag.h \
     include/Graph.h \
     include/GESFileLoader.h \
@@ -56,7 +57,8 @@ HEADERS += include/GESFileWriter.h \
     include/Edge.h
 
 # Set source
-SOURCES += src/GESTag.cpp \
+SOURCES += src/PageSettings.cpp \
+    src/GESTag.cpp \
     include/GESFileWriter.cpp \
     src/Graph.cpp \
     src/GESFileLoader.cpp \

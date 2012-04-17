@@ -5,6 +5,8 @@
 #include <QIcon>
 #include <QTabWidget>
 
+#include "PageSettings.h"
+
 class Node;
 class Edge;
 class Object;
@@ -97,9 +99,16 @@ private slots:
 	 */
 	void zoomOut();
 
+	void closeTab( int );
+
+	void changeTab( int );
+
+
 private:
 
-    //! Tab widget
+	void loadSettings( PageSettings* set );
+
+	//! Tab widget
     GESTabWidget* tabWidget;
 
     //! Contents current zoom factor.

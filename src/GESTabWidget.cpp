@@ -11,7 +11,7 @@
 #include "Macros.h"
 
 GESTabWidget::GESTabWidget() {
-
+	setTabsClosable( true );
 }
 
 GESTabWidget::~GESTabWidget() {
@@ -31,7 +31,7 @@ void GESTabWidget::addPage( QString& name, Graph* graph ){
 void GESTabWidget::setSceneState( int st ){
 	GESPage* page = getCurrentPage();
 	if( getCurrentPage() != 0 )
-		page->getScene()->setState( (GESScene::State) st );
+		page->getScene()->setState( (PageSettings::DrawState) st );
 }
 
 void GESTabWidget::setScale(const QString& sc ){

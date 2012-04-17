@@ -13,6 +13,7 @@ class GESView;
 
 #include "Object.h"
 #include <QWidget>
+#include "PageSettings.h"
 
 class GESPage : public QWidget {
 	Q_OBJECT
@@ -51,6 +52,13 @@ public:
     	return mFileName;
     }
 
+    void setSettings( PageSettings* set ){
+		mSettings = set;
+	}
+    PageSettings* getSettings(){
+    	return mSettings;
+    }
+
 
 public slots:
 
@@ -70,6 +78,9 @@ private:
 
     //! Name of file
     QString mFileName;
+
+    //! Settings of this page
+    PageSettings* mSettings;
 };
 
 #endif /* GESPAGE_H_ */

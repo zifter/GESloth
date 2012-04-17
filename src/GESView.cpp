@@ -7,9 +7,10 @@
 
 #include "GESView.h"
 #include "Macros.h"
+#include "GESPage.h"
 
-GESView::GESView() :
-		isSceneRectControlled(false) {
+GESView::GESView(GESPage* prnt ) :
+		isSceneRectControlled(false), mParentPage( prnt ){
 	setCacheMode(QGraphicsView::CacheBackground);
 	setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 	setRenderHint(QPainter::Antialiasing);
@@ -68,7 +69,9 @@ void GESView::setScale(const QString& sc)
     //Getting percent value
     QString str = sc;
     str.remove("%");
-    double d = str.toDouble()/100.0;
+    double d = str.toDouble();
+    mParentPage->getSettings()->setZoom( d );
+    d /= 100;
 
     //Setting transformation
     setTransform(t.scale(d,d),false);

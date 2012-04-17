@@ -29,19 +29,21 @@
 #include "Macros.h"
 #include "GESFileLoader.h"
 #include "GESFileWriter.h"
+#include "GESPage.h"
 
-GESScene::GESScene(GESloth *prnt) :
-		Parent(prnt), line(NULL), point(NULL), menu(NULL) {
+GESScene::GESScene(GESPage *prnt) :
+		mParentPage(prnt), line(NULL), point(NULL), menu(NULL) {
 	QPainterPath path;
 	mGraph = new Graph();
 	mGraph->setScene( this );
 	stackCommand = new QUndoStack;
-	myState = InsertNode;
+	mState = PageSettings::Node;
 }
 
-void GESScene::setState(State state){
-	myState = state;
-	bool movable = ( myState != InsertEdge );
+void GESScene::setState(PageSettings::DrawState state){
+	mParentPage->getSettings()->setState(state);
+	mState = state;
+	bool movable = ( mState != PageSettings::Edge );
 	foreach (Node *node, mGraph->nodes() )
 		node->setFlag(QGraphicsItem::ItemIsMovable, movable);
 }
@@ -57,7 +59,7 @@ void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	 if(mouseEvent->button() == Qt::LeftButton)
 	 QApplication::setOverrideCursor(Qt::PointingHandCursor);
 	 */
-	if (myState == InsertEdge && mouseEvent->button() == Qt::LeftButton
+	if (mState == PageSettings::Edge && mouseEvent->button() == Qt::LeftButton
 			&& !items(mouseEvent->scenePos()).isEmpty()) {
 		if (items(mouseEvent->scenePos()).at(0)->type() == Node::Type) {
 			if (line != NULL) {
@@ -72,7 +74,7 @@ void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 		}
 	}
 
-	if (myState == InsertNode) {
+	if (mState == PageSettings::Node) {
 		if (point != NULL) {
 			delete point;
 			point = NULL;
@@ -81,27 +83,8 @@ void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	}
 }
 
-void GESScene::addItems(QList<QGraphicsItem*> list) {
-	foreach( QGraphicsItem* item, list)
-	{
-		if (item->type() == Edge::Type) {
-			Edge* edge = qgraphicsitem_cast<Edge*>(item);
-			mGraph->add(edge);
-			addItem(edge);
-		}
-		if (item->type() == Node::Type) {
-			Node* node = qgraphicsitem_cast<Node*>(item);
-			addItem(node);
-			mGraph->add(node);
-		}
-	}
-	if (myState == InsertEdge)
-		foreach ( Node *node, mGraph->nodes() )
-			node->setFlag(QGraphicsItem::ItemIsMovable, false);
-}
-
 void GESScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-	if (myState == InsertEdge && line != NULL) {
+	if (mState == PageSettings::Edge && line != NULL) {
 		QLineF newLine(line->line().p1(), mouseEvent->scenePos());
 		line->setLine(newLine);
 	}
@@ -111,7 +94,7 @@ void GESScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 void GESScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	//QApplication::restoreOverrideCursor();
 	if (mouseEvent->button() == Qt::LeftButton) {
-		if (line != 0 && myState == InsertEdge) {
+		if (line != 0 && mState == PageSettings::Edge) {
 
 			QList<QGraphicsItem *> startItems = items(line->line().p1());
 			if (startItems.count() && startItems.first() == line)
@@ -178,39 +161,10 @@ void GESScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
 	menu->exec(event->screenPos());
 }
 
-void GESScene::deleteObj(QList<QGraphicsItem *> items) {
-	currentList = items;
-	deleteObj();
-}
-
 void GESScene::clear(){
 	mGraph->removeAll();
 }
 
-void GESScene::deleteObj() {
-	foreach(QGraphicsItem *item, currentList)
-	{
-		if (item->type() == Node::Type) {
-			Node* node = qgraphicsitem_cast<Node*>(item);
-			foreach(Edge* edge, node->OutEdges())
-			{
-				mGraph->remove(edge);
-			}
-			foreach(Edge* edge, node->InEdges())
-			{
-				mGraph->remove(edge);
-			}
-			node->del();
-			mGraph->remove(node);
-		}
-		if (item->type() == Edge::Type) {
-			Edge* edge = qgraphicsitem_cast<Edge*>(item);
-			edge->del();
-			mGraph->remove(edge);
-		}
-		removeItem(item);
-	}
-}
 void GESScene::setName() {
 
 	QWidget* txt = new QWidget();
@@ -251,8 +205,8 @@ void GESScene::setName() {
 }
 
 void GESScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) {
-	if (mouseEvent->button() == Qt::LeftButton && myState == InsertNode) {
-		Node *node = new Node(Parent);
+	if (mouseEvent->button() == Qt::LeftButton && mState == PageSettings::Node) {
+		Node *node = new Node(0);
 		node->setPos(mouseEvent->scenePos());
 		QList<QGraphicsItem*> a;
 		a << node;
@@ -263,41 +217,11 @@ void GESScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) {
 }
 
 void GESScene::copyObj() {
-	QList<Node*> nodeScn;
-	QList<Node*> nodeBuf;
-	QList<QGraphicsItem*> Buf;
-	unsigned i = 0;
-	foreach(QGraphicsItem* item, selectedItems())
-	{
-		if (item->type() == Node::Type) {
-			nodeScn.insert(i, qgraphicsitem_cast<Node*>(item));
-			Node* nd = new Node(Parent);
-			Node* nodeForText = qgraphicsitem_cast<Node*>(item);
-			nd->setText(nodeForText->getText());
-			nodeBuf.insert(i, nd);
-			nd->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
-			Buf << nd;
-			i++;
-		}
-	}
-	foreach(QGraphicsItem* item, selectedItems())
-	{
-		if (item->type() == Edge::Type) {
-			Edge* edge = qgraphicsitem_cast<Edge*>(item);
-			if (nodeScn.contains(edge->sourceNode())
-					&& nodeScn.contains(edge->destNode())) {
-				Edge* edgeCreate = new Edge(
-						nodeBuf[nodeScn.indexOf(edge->sourceNode())],
-						nodeBuf[nodeScn.indexOf(edge->destNode())]);
-				edgeCreate->setText(edge->getText());
-				Buf << edgeCreate;
-			}
-		}
-	}
+	QList<QGraphicsItem*> Buf = selectedItems();
 
 	QMimeData *mData = new QMimeData;
 	GESFileWriter writer;
-	QByteArray* bt = &writer.writeToByte( toGraph( Buf) );
+	QByteArray* bt = &writer.writeToByte( toGraph( Buf ) );
 	mData->setData("Graph Editor Sloth/items", (*bt));
 	QClipboard *pastebuf = QApplication::clipboard();
 	pastebuf->setMimeData(mData);

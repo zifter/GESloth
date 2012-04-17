@@ -11,11 +11,12 @@
 #include <QHBoxLayout>
 
 GESPage::GESPage() : mFileName(""){
-	mScene = new GESScene();
+	mSettings = new PageSettings();
+	mScene = new GESScene(this);
 	mScene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	QHBoxLayout *layout = new QHBoxLayout;
-	mView = new GESView();
+	mView = new GESView( this );
 	mView->setScene(mScene);
 	mView->setSceneRect(0, 0, 500, 500);
 	mView->setDragMode(QGraphicsView::RubberBandDrag);

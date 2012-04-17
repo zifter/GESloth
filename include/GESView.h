@@ -12,6 +12,8 @@
 #include <QWheelEvent>
 #include <GESScene.h>
 
+class GESPage;
+
 //! Просмоторщик сцены
 class GESView : public QGraphicsView
 {
@@ -19,7 +21,7 @@ class GESView : public QGraphicsView
 
 public:
     //! Пустой конструктоh
-    GESView();
+    GESView( GESPage* prnt );
     virtual ~GESView();
 
    void setScene( GESScene* scene );
@@ -43,5 +45,7 @@ protected:
 private slots:
 	void updateSceneRect(const QRectF& rect);
 
+private:
+	GESPage* mParentPage;
 };
 #endif /* GESVIEW_H_ */
