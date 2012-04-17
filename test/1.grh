@@ -2,10 +2,10 @@
 <GRAPH>
     <node text="" id="0"/>
     <node text="" id="1"/>
+    <node text="first" id="2"/>
+    <node text="" id="3"/>
     <edge text="" idsource="0" iddest="1"/>
-    <node text="first" id="3"/>
-    <edge text="23" idsource="3" iddest="0"/>
-    <node text="" id="5"/>
-    <edge text="" idsource="3" iddest="5"/>
-    <edge text="" idsource="1" iddest="3"/>
+    <edge text="23" idsource="2" iddest="0"/>
+    <edge text="" idsource="2" iddest="3"/>
+    <edge text="" idsource="1" iddest="2"/>
 </GRAPH>
