@@ -27,6 +27,11 @@
  *      Author: zifter
  */
 
+
+#include <QTextCodec>
+#include <QFile>
+#include <qdom.h>
+#include "Graph/Graph.h"
 #include "Graph/Edge.h"
 #include "Graph/Node.h"
 
@@ -35,56 +40,99 @@
 
 #include "Macros.h"
 
-#include <QXmlStreamWriter>
-#include <QTextCodec>
-#include <QFile>
-
-GESFileWriter::GESFileWriter() {
-	// TODO Auto-generated constructor stub
+GESFileWriter::GESFileWriter() : mStream(&mByte) {
 
 }
 
 GESFileWriter::~GESFileWriter() {
-	// TODO Auto-generated destructor stub
 }
 
-void GESFileWriter::write(Graph* graph, QString name) {
-	QFile fileOut(name);
+void GESFileWriter::write(GESPage* page) {
+	QFile fileOut(page->getFileName());
 	if (!fileOut.open(QFile::WriteOnly | QFile::Text))
 		return;
-	fileOut.write(writeToByte(graph));
+
+	QTextCodec *codec = QTextCodec::codecForName("windows-1251");
+	mStream.setCodec(codec);
+	mStream.setAutoFormatting(true);
+	mStream.writeStartDocument();
+
+	writeGraph(page->getScene()->getGraph());
+
+	writeSettings( page->getSettings() );
+
+	mStream.writeEndDocument();
+
+	fileOut.write(mByte);
 	fileOut.close();
 }
 
-QByteArray& GESFileWriter::writeToByte(Graph* graph) {
-	QByteArray* bt = new QByteArray();
-	QXmlStreamWriter stream(bt);
+QByteArray& GESFileWriter::writeGraphToByte(Graph* graph) {
 	QTextCodec *codec = QTextCodec::codecForName("windows-1251");
-	stream.setCodec(codec);
-	stream.setAutoFormatting(true);
-	stream.writeStartDocument();
-	stream.writeStartElement(tag::XML_GRAPH);
+	mStream.setCodec(codec);
+	mStream.setAutoFormatting(true);
+	mStream.writeStartDocument();
+
+	writeGraph(graph);
+
+	mStream.writeEndDocument();
+
+	return mByte;
+}
+
+void GESFileWriter::writeGraph(Graph* graph) {
+	mStream.writeStartElement(tag::XML_GRAPH);
 
 	foreach(Node* node, graph->nodes())
 	{
-		stream.writeStartElement(tag::XML_NODE);
-		stream.writeAttribute(attr::XML_TEXT, node->getText());
-		stream.writeAttribute(attr::XML_ID,
-				QString::number(graph->nodes().indexOf(node)));
-		stream.writeEndElement();
+		mStream.writeStartElement(tag::XML_NODE);
+			mStream.writeAttribute(attr::XML_TEXT, node->getText());
+			mStream.writeAttribute(attr::XML_ID,
+					QString::number(graph->nodes().indexOf(node)));
+				mStream.writeStartElement(tag::XML_CENTER);
+					writePointF( node->pos());
+				mStream.writeEndElement();
+		mStream.writeEndElement();
 	}
 	foreach(Edge* edge, graph->edges())
 	{
-		stream.writeStartElement(tag::XML_EDGE);
-		stream.writeAttribute(attr::XML_TEXT, edge->getText());
-		stream.writeAttribute(attr::XML_ID_SOURCE,
-				QString::number(graph->nodes().indexOf(edge->sourceNode())));
-		stream.writeAttribute(attr::XML_ID_DEST,
-				QString::number(graph->nodes().indexOf(edge->destNode())));
-		stream.writeEndElement();
+		mStream.writeStartElement(tag::XML_EDGE);
+			mStream.writeAttribute(attr::XML_TEXT, edge->getText());
+			mStream.writeAttribute(attr::XML_ID_SOURCE,
+					QString::number(graph->nodes().indexOf(edge->sourceNode())));
+			mStream.writeAttribute(attr::XML_ID_DEST,
+					QString::number(graph->nodes().indexOf(edge->destNode())));
+		mStream.writeEndElement();
 	}
 
-	stream.writeEndElement();
-	stream.writeEndDocument();
-	return *bt;
+	mStream.writeEndElement();
+}
+
+void GESFileWriter::writeSettings(PageSettings* set) {
+	mStream.writeStartElement(tag::XML_SETTINGS);
+
+		// scene rect
+		mStream.writeStartElement(tag::XML_SCENE_RECT);
+
+			mStream.writeStartElement(tag::XML_SIZE);
+				QSizeF size = set->getSceneRect().size();
+				writePointF( QPointF( size.width(), size.height() ) );
+			mStream.writeEndElement();
+
+			mStream.writeStartElement(tag::XML_CENTER);
+				writePointF( set->getSceneRect().center());
+			mStream.writeEndElement();
+
+		mStream.writeEndElement();
+
+	mStream.writeEndElement();
+}
+
+void  GESFileWriter::writePointF(QPointF p) {
+	mStream.writeStartElement(tag::XML_POINTF);
+
+	mStream.writeAttribute(attr::XML_X, QString::number( p.x() ));
+	mStream.writeAttribute(attr::XML_Y, QString::number( p.y() ));
+
+	mStream.writeEndElement();
 }

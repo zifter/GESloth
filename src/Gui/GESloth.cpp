@@ -66,26 +66,30 @@ const int GESloth::mScaleFactorChange = 25;
 const int GESloth::minScaleFactor = 25;
 const int GESloth::maxScaleFactor = 999;
 
-GESloth::GESloth(QApplication* app) {
-	tabWidget = new GESTabWidget( );
+GESloth::GESloth(QApplication* app) : mFileExt(".ges"), isActiveToolBar(false){
+	mTabWidget = new GESTabWidget( );
 
 	setMinimumSize(450, 450);
 	setWindowTitle(tr("Graph Editor Sloth"));
-	setCentralWidget(tabWidget);
+	setCentralWidget(mTabWidget);
 
 	createToolBar();
 	createAction();
 	createMenus();
 
-	connect(tabWidget, SIGNAL( currentChanged ( int ) ), this,
+	mImageFilter = "*.png *.jpeg";
+	mOpenFilter = QString("*" + mFileExt);
+	mSaveFilter = QString("*" + mFileExt);
+
+	connect(mTabWidget, SIGNAL( currentChanged ( int ) ), this,
 			SLOT( changeTab(int) ));
-	connect(tabWidget, SIGNAL( tabCloseRequested ( int ) ), this,
+	connect(mTabWidget, SIGNAL( tabCloseRequested ( int ) ), this,
 			SLOT( closeTab(int) ));
 
 }
 
 void GESloth::createToolBar() {
-	pointerTypeGroup = new QButtonGroup;
+	mToolGroup = new QButtonGroup;
 
 	QToolButton *pointerButton = new QToolButton;
 	pointerButton->setCheckable(true);
@@ -98,9 +102,9 @@ void GESloth::createToolBar() {
 	linePointerButton->setIcon(getIcon("linepointer"));
 	linePointerButton->setToolTip(tr("Edge mode"));
 
-	pointerTypeGroup->addButton(pointerButton, int(PageSettings::Node));
-	pointerTypeGroup->addButton(linePointerButton, int(PageSettings::Edge));
-	connect(pointerTypeGroup, SIGNAL(buttonClicked(int)), tabWidget,
+	mToolGroup->addButton(pointerButton, int(PageSettings::Node));
+	mToolGroup->addButton(linePointerButton, int(PageSettings::Edge));
+	connect(mToolGroup, SIGNAL(buttonClicked(int)), mTabWidget,
 			SLOT(setSceneState(int)));
 
 	QToolButton *switchOff = new QToolButton;
@@ -140,75 +144,16 @@ void GESloth::createMenus() {
 	menuEdit->addAction(mActionRedo);
 	menuEdit->addAction(mActionUndo);
 
-	// about
-	QAction* action = new QAction(
-			QIcon::fromTheme("help-about", getIcon("about")), tr("About... "),
-			this);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Show some little info about this program"));
-	action->setIconVisibleInMenu(true);
-	connect(action, SIGNAL(triggered()), this, SLOT(about()));
-	menuHelp->addAction(action);
+	menuHelp->addAction(mActionAbout);
+	menuHelp->addAction(mActionAboutQt);
 
-	// about qt
-	action = new QAction(getIcon("aboutQt"), tr("About Qt..."), this);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Show the Qt library's About box"));
-	action->setIconVisibleInMenu(true);
-	connect(action, SIGNAL(triggered()), this, SLOT(aboutQt()));
-	menuHelp->addAction(action);
-
-	// new
-	action = new QAction(QIcon::fromTheme("document-new", getIcon("new")),
-			tr("New..."), this);
-	action->setShortcut(QKeySequence::New);
-	action->setIconVisibleInMenu(true);
-	action->setCheckable(false);
-	action->setStatusTip(tr("New file"));
-	connect(action, SIGNAL(triggered()), this, SLOT(newPage()));
-	menuFile->addAction(action);
-
-	// open
-	action = new QAction(QIcon::fromTheme("document-open", getIcon("open")),
-			tr("Open..."), this);
-	action->setShortcut(QKeySequence::Open);
-	action->setIconVisibleInMenu(true);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Open file"));
-	connect(action, SIGNAL(triggered()), this, SLOT(Open()));
-	menuFile->addAction(action);
-
-	// save
-	action = new QAction(QIcon::fromTheme("document-save", getIcon("save")),
-			tr("Save..."), this);
-	action->setShortcut(QKeySequence::Save);
-	action->setIconVisibleInMenu(true);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Save file"));
-	connect(action, SIGNAL(triggered()), this, SLOT(Save()));
-	menuFile->addAction(action);
-
-	// save as
-	action = new QAction(
-			QIcon::fromTheme("document-save-as", getIcon("saveAs")),
-			tr("Save as..."), this);
-	action->setShortcut(QKeySequence::SaveAs);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Save file as"));
-	action->setIconVisibleInMenu(true);
-	connect(action, SIGNAL(triggered()), this, SLOT(SaveAs()));
-	menuFile->addAction(action);
+	menuFile->addAction(mActionNew);
+	menuFile->addAction(mActionOpen);
+	menuFile->addAction(mActionSave);
+	menuFile->addAction(mActionSaveAs);
 
 	menuFile->addSeparator();
-
-	// export
-	action = new QAction(QIcon::fromTheme("insert-image", getIcon("export")),
-			tr("Export..."), this);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Export file to image"));
-	action->setIconVisibleInMenu(true);
-	connect(action, SIGNAL(triggered()), this, SLOT(exportToImage()));
-	menuFile->addAction(action);
+	menuFile->addAction(mActionExport);
 
 	QMenu* translateMenu = new QMenu(tr("Translation"));
 	translateMenu->setIcon(
@@ -241,16 +186,43 @@ void GESloth::createMenus() {
 	menuFile->addSeparator();
 	menuFile->addMenu(translateMenu);
 	menuFile->addSeparator();
+	menuFile->addAction(mActionClose);
 
-	// close
-	action = new QAction(QIcon::fromTheme("window-close", getIcon("close")),
-			tr("Close..."), this);
-	action->setShortcut(QKeySequence::Close);
-	action->setCheckable(false);
-	action->setStatusTip(tr("Exit from program"));
-	action->setIconVisibleInMenu(true);
-	connect(action, SIGNAL(triggered()), this, SLOT(close()));
-	menuFile->addAction(action);
+	deactivateToolBar();
+
+}
+
+void GESloth::activateToolBar(){
+	isActiveToolBar = true;
+	mActionSaveAs->setDisabled(false);
+	mActionSave->setDisabled(false);
+	mActionExport->setDisabled(false);
+
+	mActionCut->setDisabled(false);
+	mActionPaste->setDisabled(false);
+	mActionCopy->setDisabled(false);
+	mActionDelete->setDisabled(false);
+	mActionRedo->setDisabled(false);
+	mActionUndo->setDisabled(false);
+	mActionClear->setDisabled(false);
+	mActionSelectAll->setDisabled(false);
+	mToolBar->show();
+}
+void GESloth::deactivateToolBar(){
+	isActiveToolBar = false;
+	mActionSaveAs->setDisabled(true);
+	mActionSave->setDisabled(true);
+	mActionExport->setDisabled(true);
+
+	mActionCut->setDisabled(true);
+	mActionPaste->setDisabled(true);
+	mActionCopy->setDisabled(true);
+	mActionDelete->setDisabled(true);
+	mActionRedo->setDisabled(true);
+	mActionUndo->setDisabled(true);
+	mActionClear->setDisabled(true);
+	mActionSelectAll->setDisabled(true);
+	mToolBar->hide();
 }
 
 void GESloth::createAction() {
@@ -276,8 +248,79 @@ void GESloth::createAction() {
 	mZoomFactorLine = b->lineEdit();
 	mZoomFactorLine->setInputMask("D90%");
 	mToolBar->addWidget(b);
-	connect(mZoomFactorLine, SIGNAL( textChanged(const QString&)), tabWidget,
+	connect(mZoomFactorLine, SIGNAL( textChanged(const QString&)), mTabWidget,
 			SLOT(setScale(const QString&)));
+
+	// about
+    mActionAbout = new QAction(
+			QIcon::fromTheme("help-about", getIcon("about")), tr("About... "),
+			this);
+    mActionAbout->setCheckable(false);
+    mActionAbout->setStatusTip(tr("Show some little info about this program"));
+    mActionAbout->setIconVisibleInMenu(true);
+	connect(mActionAbout, SIGNAL(triggered()), this, SLOT(about()));
+
+	// about qt
+	mActionAboutQt = new QAction(getIcon("aboutQt"), tr("About Qt..."), this);
+	mActionAboutQt->setCheckable(false);
+	mActionAboutQt->setStatusTip(tr("Show the Qt library's About box"));
+	mActionAboutQt->setIconVisibleInMenu(true);
+	connect(mActionAboutQt, SIGNAL(triggered()), this, SLOT(aboutQt()));
+
+	// new
+	mActionNew = new QAction(QIcon::fromTheme("document-new", getIcon("new")),
+			tr("New..."), this);
+	mActionNew->setShortcut(QKeySequence::New);
+	mActionNew->setIconVisibleInMenu(true);
+	mActionNew->setCheckable(false);
+	mActionNew->setStatusTip(tr("New file"));
+	connect(mActionNew, SIGNAL(triggered()), this, SLOT(newPage()));
+
+	// open
+	mActionOpen = new QAction(QIcon::fromTheme("document-open", getIcon("open")),
+			tr("Open..."), this);
+	mActionOpen->setShortcut(QKeySequence::Open);
+	mActionOpen->setIconVisibleInMenu(true);
+	mActionOpen->setCheckable(false);
+	mActionOpen->setStatusTip(tr("Open file"));
+	connect(mActionOpen, SIGNAL(triggered()), this, SLOT(Open()));
+
+	// save
+	mActionSave = new QAction(QIcon::fromTheme("document-save", getIcon("save")),
+			tr("Save..."), this);
+	mActionSave->setShortcut(QKeySequence::Save);
+	mActionSave->setIconVisibleInMenu(true);
+	mActionSave->setCheckable(false);
+	mActionSave->setStatusTip(tr("Save file"));
+	connect(mActionSave, SIGNAL(triggered()), this, SLOT(Save()));
+
+	// save as
+	mActionSaveAs = new QAction(
+			QIcon::fromTheme("document-save-as", getIcon("saveAs")),
+			tr("Save as..."), this);
+	mActionSaveAs->setShortcut(QKeySequence::SaveAs);
+	mActionSaveAs->setCheckable(false);
+	mActionSaveAs->setStatusTip(tr("Save file as"));
+	mActionSaveAs->setIconVisibleInMenu(true);
+	connect(mActionSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
+
+	// export
+	mActionExport = new QAction(QIcon::fromTheme("insert-image", getIcon("export")),
+			tr("Export..."), this);
+	mActionExport->setCheckable(false);
+	mActionExport->setStatusTip(tr("Export file to image"));
+	mActionExport->setIconVisibleInMenu(true);
+	connect(mActionExport, SIGNAL(triggered()), this, SLOT(exportToImage()));
+
+	// close
+	mActionClose = new QAction(QIcon::fromTheme("window-close", getIcon("close")),
+			tr("Close..."), this);
+	mActionClose->setShortcut(QKeySequence::Close);
+	mActionClose->setCheckable(false);
+	mActionClose->setStatusTip(tr("Exit from program"));
+	mActionClose->setIconVisibleInMenu(true);
+	connect(mActionClose, SIGNAL(triggered()), this, SLOT(close()));
+
 
 	//Zoom out
 	action = new QAction(QIcon::fromTheme("zoom-out", getIcon("zoomOut")),
@@ -302,7 +345,7 @@ void GESloth::createAction() {
 	mActionSelectAll->setShortcut(QKeySequence::SelectAll);
 	mActionSelectAll->setIconVisibleInMenu(true);
 	mActionSelectAll->setStatusTip("Select all items");
-	connect(mActionSelectAll, SIGNAL(triggered()), tabWidget,
+	connect(mActionSelectAll, SIGNAL(triggered()), mTabWidget,
 			SLOT(selectAll()));
 
 	// copy
@@ -311,7 +354,7 @@ void GESloth::createAction() {
 	mActionCopy->setShortcut(QKeySequence::Copy);
 	mActionCopy->setIconVisibleInMenu(true);
 	mActionCopy->setStatusTip("Copy selected items");
-	connect(mActionCopy, SIGNAL(triggered()), tabWidget, SLOT(copyObj()));
+	connect(mActionCopy, SIGNAL(triggered()), mTabWidget, SLOT(copyObj()));
 
 	// paste
 	mActionPaste = new QAction(QIcon::fromTheme("edit-paste", getIcon("paste")),
@@ -319,7 +362,7 @@ void GESloth::createAction() {
 	mActionPaste->setShortcut(QKeySequence::Paste);
 	mActionPaste->setIconVisibleInMenu(true);
 	mActionPaste->setStatusTip("Paste items from buffer");
-	connect(mActionPaste, SIGNAL(triggered()), tabWidget, SLOT(pasteObj()));
+	connect(mActionPaste, SIGNAL(triggered()), mTabWidget, SLOT(pasteObj()));
 
 	// undo
 	mActionUndo = new QAction(QIcon::fromTheme("edit-undo", getIcon("undo")),
@@ -327,7 +370,7 @@ void GESloth::createAction() {
 	mActionUndo->setShortcut(QKeySequence::Undo);
 	mActionUndo->setIconVisibleInMenu(true);
 	mActionUndo->setStatusTip("Cancel previous command");
-	connect(mActionUndo, SIGNAL(triggered()), tabWidget, SLOT(undoCommand()));
+	connect(mActionUndo, SIGNAL(triggered()), mTabWidget, SLOT(undoCommand()));
 
 	// redo
 	mActionRedo = new QAction(QIcon::fromTheme("edit-redo", getIcon("redo")),
@@ -335,7 +378,7 @@ void GESloth::createAction() {
 	mActionRedo->setShortcut(QKeySequence::Redo);
 	mActionRedo->setIconVisibleInMenu(true);
 	mActionRedo->setStatusTip("Redo previous undo-command");
-	connect(mActionRedo, SIGNAL(triggered()), tabWidget, SLOT(redoCommand()));
+	connect(mActionRedo, SIGNAL(triggered()), mTabWidget, SLOT(redoCommand()));
 
 	// delete
 	mActionDelete = new QAction(
@@ -344,7 +387,7 @@ void GESloth::createAction() {
 	mActionDelete->setShortcut(QKeySequence::Delete);
 	mActionDelete->setIconVisibleInMenu(true);
 	mActionDelete->setStatusTip("Delete selected items");
-	connect(mActionDelete, SIGNAL(triggered()), tabWidget,
+	connect(mActionDelete, SIGNAL(triggered()), mTabWidget,
 			SLOT(deleteSelectedObj()));
 
 	// clear
@@ -353,7 +396,7 @@ void GESloth::createAction() {
 	mActionClear->setShortcut(QKeySequence::Refresh);
 	mActionClear->setIconVisibleInMenu(true);
 	mActionClear->setStatusTip("Clear page");
-	connect(mActionClear, SIGNAL(triggered()), tabWidget, SLOT(clear()));
+	connect(mActionClear, SIGNAL(triggered()), mTabWidget, SLOT(clear()));
 
 	// cut
 	mActionCut = new QAction(QIcon::fromTheme("edit-cut", getIcon("cut")),
@@ -361,22 +404,19 @@ void GESloth::createAction() {
 	mActionCut->setShortcut(QKeySequence::Cut);
 	mActionCut->setIconVisibleInMenu(true);
 	mActionSelectAll->setStatusTip("Cut selected items");
-	connect(mActionCut, SIGNAL(triggered()), tabWidget, SLOT(cutObj()));
+	connect(mActionCut, SIGNAL(triggered()), mTabWidget, SLOT(cutObj()));
 
 }
 
 void GESloth::exportToImage() {
-//	QString filters(tr("*.png\n"
-//			"All Files(*.*)"));
-//	QString fileName = QCoreApplication::applicationDirPath() + "/"
-//			+ tr("Insert name.png");
-//	QString selectedFilter;
-//	fileName = QFileDialog::getSaveFileName(this, tr("Export file to ..."),
-//			fileName, filters);
-//
-//	if (!fileName.isEmpty())
-//		QPixmap::grabWidget(mView->viewport()).save(fileName, "png");
-	tabWidget->getViewportPixmap()->save("asd", "png");
+	GESPage* page = mTabWidget->getCurrentPage();
+	QString FileName = QFileDialog::getSaveFileName(0, tr("Save graph to image"), "",
+			mImageFilter);
+	if (FileName == "" || page == 0)
+		return;
+	QImage* tmp = mTabWidget->getSceneImage();
+	tmp->save(FileName, "png");
+	delete tmp;
 }
 
 void GESloth::aboutQt() {
@@ -401,7 +441,7 @@ void GESloth::switchOff(bool flagSwtch) {
 
 void GESloth::Open() {
 	QString FileName = QFileDialog::getOpenFileName(0, tr("Open graph"), "",
-			"*.grh");
+			mOpenFilter);
 
 	if (FileName == "")
 		return;
@@ -410,28 +450,32 @@ void GESloth::Open() {
 	Graph* graph = new Graph();
 	if (!loader.load(graph, FileName))
 		loader.showError();
-	tabWidget->addPage(FileName, graph);
+	if( !isActiveToolBar )
+		activateToolBar();
+	mTabWidget->addPage(FileName, graph);
 
 }
 
 void GESloth::Save() {
-	GESPage* page = tabWidget->getCurrentPage();
+	GESPage* page = mTabWidget->getCurrentPage();
 	if (page->getFileName() == "") {
 		SaveAs();
 		return;
 	}
 	GESFileWriter writer;
-	writer.write(page->getScene()->getGraph(), page->getFileName());
+	writer.write( page );
 }
 
 void GESloth::SaveAs() {
-	GESPage* page = tabWidget->getCurrentPage();
+	GESPage* page = mTabWidget->getCurrentPage();
 	QString FileName = QFileDialog::getSaveFileName(0, tr("Save graph"), "",
-			"*.grh");
+			mSaveFilter);
 	if (FileName == "")
 		return;
+	FileName += mFileExt;
 	GESFileWriter writer;
-	writer.write(page->getScene()->getGraph(), FileName);
+	page->setFileName( FileName );
+	writer.write(page);
 }
 
 void GESloth::switchLang(QAction* act) {
@@ -454,7 +498,9 @@ QIcon GESloth::getIcon(const QString& name) {
 }
 
 void GESloth::newPage() {
-	tabWidget->addPage();
+	if( !isActiveToolBar )
+		activateToolBar();
+	mTabWidget->addPage();
 }
 
 void GESloth::viewScaleChanged(int newScale) {
@@ -465,7 +511,7 @@ void GESloth::viewScaleChanged(int newScale) {
 
 void GESloth::zoomIn() {
 	qint32 oldScale = mZoomFactorLine->text().remove('%').toInt();
-	qint32 newScale = oldScale - mScaleFactorChange;
+	qint32 newScale = oldScale + mScaleFactorChange;
 	if (newScale < minScaleFactor)
 		newScale = minScaleFactor;
 	mZoomFactorLine->setText(QString::number(newScale));
@@ -473,31 +519,32 @@ void GESloth::zoomIn() {
 
 void GESloth::zoomOut() {
 	qint32 oldScale = mZoomFactorLine->text().remove('%').toInt();
-	qint32 newScale = oldScale + mScaleFactorChange;
+	qint32 newScale = oldScale - mScaleFactorChange;
 	if (newScale > maxScaleFactor)
 		newScale = maxScaleFactor;
 	mZoomFactorLine->setText(QString::number(newScale));
 }
 
 void GESloth::closeTab(int index) {
-	tabWidget->removeTab(index);
+	mTabWidget->removePage(index);
+	if( mTabWidget->currentIndex() == -1 )
+		deactivateToolBar();
 }
 
 void GESloth::changeTab(int) {
-	GESPage* page = tabWidget->getCurrentPage();
+	GESPage* page = mTabWidget->getCurrentPage();
 	if (page != 0)
 		loadSettings(page->getSettings());
 }
 
 void GESloth::loadSettings(PageSettings* set) {
-	pointerTypeGroup->button((int) set->getState())->setChecked(true);
+	mToolGroup->button((int) set->getState())->setChecked(true);
 	mZoomFactorLine->setText(QString::number(set->getZoom()));
 }
 
 void GESloth::wheelEvent( QWheelEvent* event ){
 	if (event->modifiers() == Qt::ControlModifier) {
-		mZoomFactorLine->setText(QString::number(tabWidget->getCurrentPage()->getSettings()->getZoom()));
+		mZoomFactorLine->setText(QString::number(mTabWidget->getCurrentPage()->getSettings()->getZoom()));
 	} else
 		emit QWidget::wheelEvent(event);
 }
-

@@ -41,7 +41,8 @@ SUBDIRS = src/ \
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/Gui/Command.h \
+HEADERS += include/Algorithm/AbstractAlgorithm.h \
+    include/Gui/Command.h \
     include/Gui/PageSettings.h \
     include/XML/GESFileLoader.h \
     include/XML/GESFileWriter.h \
@@ -59,21 +60,22 @@ HEADERS += include/Gui/Command.h \
     include/Graph/Object.h
 
 # Set source
-SOURCES += src/Gui/Command.cpp \
+SOURCES += src/Algorithm/AbstractAlgorithm.cpp \
+    src/Gui/Command.cpp \
     src/Gui/PageSettings.cpp \
-    src/XML/GESFileLoader.cpp \
-    src/XML/GESFileWriter.cpp \
     src/Gui/GESPage.cpp \
     src/Gui/GESScene.cpp \
     src/Gui/GESTabWidget.cpp \
     src/Gui/GESView.cpp \
     src/Gui/GESloth.cpp \
-    src/HelpBrowser.cpp \
+    src/XML/GESFileLoader.cpp \
+    src/XML/GESFileWriter.cpp \
     src/Graph/Edge.cpp \
     src/Graph/Node.cpp \
     src/Graph/Graph.cpp \
     src/Graph/Object.cpp \
-    src/main.cpp
+	src/HelpBrowser.cpp \
+	src/main.cpp
 
 # Set translations
 TRANSLATIONS += media/translations/graphicsRedactor_ru.ts \

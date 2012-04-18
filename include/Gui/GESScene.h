@@ -27,6 +27,7 @@
 
 #include <QMimeData>
 #include <QGraphicsView>
+#include <QUndoStack>
 
 #include "PageSettings.h"
 
@@ -39,7 +40,6 @@ class QWidget;
 class QLineEdit;
 class QByteArray;
 class QDomElement;
-class QUndoStack;
 class QWheelEvent;
 class QComboBox;
 class Graph;
@@ -50,22 +50,22 @@ Q_OBJECT
 
 public:
 	GESScene(GESPage* prnt);
-	virtual ~GESScene() {
-	}
+	virtual ~GESScene();
 
 	void setGraph(Graph* gr);
+
 	Graph* getGraph() const {
 		return mGraph;
 	}
 
+	void add( Edge* );
+	void add( Node* );
+
+	void renderToImage(QPainter *painter, const QRectF &target, const QRectF &source);
+
 public slots:
 	//! Установка состояния
 	void setState(PageSettings::DrawState state);
-	/*
-	//! Получить состояние
-	State getState() {
-		return myState;
-	}*/
 
 	//! Удалить
 	void deleteSelectedObj();
@@ -120,13 +120,13 @@ private:
 	Graph* mGraph;
 
 	//! Линия
-	QGraphicsLineItem *line;
+	QGraphicsLineItem* line;
 
 	//! Контрольная точка
-	QPointF *point;
+	QPointF* point;
 
 	//! Меню
-	QMenu *menu;
+	QMenu* menu;
 
 	PageSettings::DrawState mState;
 
@@ -136,15 +136,8 @@ private:
 	//! Текущие объекты
 	QList<QGraphicsItem*> currentList;
 
-	//! Разбор вершины
-	bool parseNode(QDomElement& node, QMap<int, Node*>& list);
-
-	//! Разбор ребра
-	bool parseEdge(QDomElement& edge, QMap<int, Node*>& list
-			, QList<Edge*>& edges);
-
 	//! Стек команд
-	QUndoStack* stackCommand;
+	QUndoStack stackCommand;
 
 };
 

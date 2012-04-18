@@ -34,6 +34,8 @@
 #include "Gui/GESView.h"
 #include "Gui/GESTabWidget.h"
 
+#include "Macros.h"
+
 GESPage::GESPage( GESTabWidget* prnt ) : QWidget( prnt ), mFileName(""){
 	mSettings = new PageSettings();
 	mScene = new GESScene(this);
@@ -50,7 +52,9 @@ GESPage::GESPage( GESTabWidget* prnt ) : QWidget( prnt ), mFileName(""){
 }
 
 GESPage::~GESPage() {
-
+	delete mScene;
+	delete mSettings;
+	delete mView;
 }
 /*
 void GESPage::delItem(Object* obj) {

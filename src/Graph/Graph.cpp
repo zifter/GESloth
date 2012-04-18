@@ -35,6 +35,14 @@ Graph::Graph() :
 }
 
 Graph::~Graph() {
+	foreach(Node* node, mNodes )
+	{
+		delete node;
+	}
+	foreach(Edge* edge, mEdges )
+	{
+		delete edge;
+	}
 }
 
 void Graph::setScene(GESScene* scn) {

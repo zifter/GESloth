@@ -31,15 +31,25 @@
 #define GESFILEWRITER_H_
 
 #include <QByteArray>
-#include "Graph/Graph.h"
+#include <QXmlStreamWriter>
+#include "Gui/GESPage.h"
+#include "Gui/PageSettings.h"
 
 class GESFileWriter {
 public:
 	GESFileWriter();
 	~GESFileWriter();
 
-	void write( Graph* graph, QString name );
-	QByteArray& writeToByte( Graph* graph );
+	void write( GESPage* page );
+	QByteArray& writeGraphToByte(Graph* graph);
+
+private:
+	void writeSettings( PageSettings* set );
+	void writeGraph( Graph* graph );
+
+	void writePointF( QPointF p );
+	QXmlStreamWriter mStream;
+	QByteArray mByte;
 };
 
 #endif /* GESFILEWRITER_H_ */

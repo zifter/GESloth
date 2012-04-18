@@ -30,6 +30,7 @@
 #include "Gui/GESTabWidget.h"
 #include "Gui/GESScene.h"
 #include "Gui/GESView.h"
+#include "Gui/GESPage.h"
 
 #include "Macros.h"
 GESTabWidget::GESTabWidget( )  {
@@ -37,6 +38,7 @@ GESTabWidget::GESTabWidget( )  {
 }
 
 GESTabWidget::~GESTabWidget() {
+
 }
 
 void GESTabWidget::addPage(){
@@ -48,6 +50,12 @@ void GESTabWidget::addPage( QString& name, Graph* graph ){
 	page->setFileName( name );
 	page->getScene()->setGraph( graph );
 	addTab( page, name );
+}
+
+void GESTabWidget::removePage(int index){
+	GESPage* page = qobject_cast< GESPage* >( widget( index ) );
+	removeTab( index );
+	delete page;
 }
 
 void GESTabWidget::setSceneState( int st ){
@@ -62,46 +70,21 @@ void GESTabWidget::setScale(const QString& sc ){
 		page->getView()->setScale( sc );
 }
 
-QPixmap* GESTabWidget::getViewportPixmap(){
-
-
-
-//    SCgScene *scene = qobject_cast<SCgScene*>(input);
-//
-//    QSize sz = scene->itemsBoundingRect().size().toSize();
-//    QRect rect = scene->itemsBoundingRect().toRect();
-//
-//    QString isSVG = file_name.mid(file_name.length()-3);
-//   /* if(isSVG=="svg"){
-//         QSvgGenerator generator;
-//         generator.setFileName(file_name);
-//         generator.setSize(sz);
-//         generator.setViewBox(rect);
-//         //generator.setTitle(tr("SVG image for GWF"));
-//         generator.setDescription(tr("An SVG drawing created by Knowledge base Editor."));
-//         QPainter painter(&generator);
-//         painter.setRenderHint(QPainter::Antialiasing,true);
-//         scene->render(&painter,QRect(QPoint(0,0), sz),scene->itemsBoundingRect());
-//         return true;
-//     }
-//    else*/{
-//        QImage img(sz,QImage::Format_ARGB32_Premultiplied);
-//        if (!img.isNull())
-//        {
-//            QPainter painter(&img);
-//            painter.setRenderHint(QPainter::Antialiasing, true);
-//            painter.eraseRect(QRect(QPoint(0,0),sz));
-//            scene->renderToImage(&painter, QRect(QPoint(0,0), sz), scene->itemsBoundingRect());
-//            return img.save(file_name);
-//        }
-//
-//
-
+QImage* GESTabWidget::getSceneImage(){
 	GESPage* page = getCurrentPage();
+    GESScene* scene = page->getScene();
 
-	if( getCurrentPage() == 0 )
-		return 0;
-	QPixmap* pix = new QPixmap( QPixmap::grabWidget(page->getView()->viewport()));
+	QSize sz = scene->itemsBoundingRect().size().toSize();
+    //QRect rect = scene->itemsBoundingRect().toRect();
+
+	QImage* pix = new QImage( sz,QImage::Format_ARGB32_Premultiplied);
+	if (!pix->isNull())
+	{
+		QPainter painter(pix);
+		painter.setRenderHint(QPainter::Antialiasing, true);
+		painter.eraseRect(QRect(QPoint(0,0),sz));
+		scene->renderToImage(&painter, QRect(QPoint(0,0), sz), scene->itemsBoundingRect());
+	}
 	return pix;
 }
 

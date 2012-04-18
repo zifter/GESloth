@@ -46,15 +46,11 @@ public:
 
 	void addPage();
 	void addPage(QString& name, Graph*);
+	void removePage(int index);
 
-	QPixmap* getViewportPixmap();
+	QImage* getSceneImage();
 
 	GESPage* getCurrentPage();
-
-	void emitViewScaleChanged( int fac ){
-
-		emit viewScaleChanged( fac );
-	}
 
 public slots:
 
@@ -77,9 +73,6 @@ public slots:
 	void cutObj();
 
 	void clear();
-
-signals:
-	void viewScaleChanged( int );
 };
 
 #endif /* GESTABWIDGET_H_ */

@@ -27,7 +27,7 @@
 #include <QIcon>
 #include <QTabWidget>
 
-#include "PageSettings.h"
+#include "Gui/PageSettings.h"
 
 class Node;
 class Edge;
@@ -82,6 +82,8 @@ protected:
 
 	void wheelEvent( QWheelEvent* event );
 
+	void activateToolBar();
+	void deactivateToolBar();
 private slots:
     //! Экспортировка в изображение
     void exportToImage();
@@ -130,27 +132,40 @@ private slots:
 	 */
 	void zoomOut();
 
+	/**
+	 * @brief Clot of closing tab
+	 */
 	void closeTab( int );
 
+	/**
+	 * @brief Clot of changing tab
+	 */
 	void changeTab( int );
 
 
 private:
 
+	QString mImageFilter;
+	QString mOpenFilter;
+	QString mSaveFilter;
+	const QString mFileExt;
+
 	//! Tab widget
-    GESTabWidget* tabWidget;
+    GESTabWidget* mTabWidget;
 
     //! Contents current zoom factor.
     QLineEdit* mZoomFactorLine;
 
     //! Группа кнопок
-    QButtonGroup *pointerTypeGroup;
+    QButtonGroup *mToolGroup;
 
     //! Панель инструментов
     QToolBar *mToolBar;
 
     //! Имя файла
     QString NameOfFile;
+
+    bool isActiveToolBar;
 
     //! Action
     QAction* mActionCut;
@@ -160,7 +175,15 @@ private:
     QAction* mActionRedo;
 	QAction* mActionUndo;
 	QAction* mActionClear;
-    QAction* mActionSelectAll;
+	QAction* mActionSelectAll;
+    QAction* mActionNew;
+    QAction* mActionOpen;
+    QAction* mActionSave;
+    QAction* mActionSaveAs;
+    QAction* mActionExport;
+    QAction* mActionClose;
+    QAction* mActionAbout;
+    QAction* mActionAboutQt;
 
 };
 

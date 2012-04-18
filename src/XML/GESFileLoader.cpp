@@ -121,9 +121,16 @@ bool GESFileLoader::parseNode(QDomElement& node, QMap<int, Node*>& list) {
 			QString id = node.attribute(attr::XML_ID);
 			Node* nd = new Node(0);
 			nd->setText(text);
-			nd->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
 			list.insert(id.toInt(), nd);
-			return true;
+
+			sAttr = attr::XML_X;
+			parseRezult = node.hasAttribute(attr::XML_X) && node.hasAttribute(attr::XML_X);
+			if( parseRezult ){
+				QString valX = node.attribute(sAttr);
+				QString valY = node.attribute(sAttr);
+
+				nd->setPos( valX.toDouble(), valY.toDouble() );
+			}
 		}
 	}
 

@@ -60,22 +60,35 @@ GESScene::GESScene(GESPage *prnt) :
 	QPainterPath path;
 	mGraph = new Graph();
 	mGraph->setScene( this );
-	stackCommand = new QUndoStack;
 	mState = PageSettings::Node;
 }
 
+GESScene::~GESScene(){
+	delete mGraph;
+	delete line;
+	delete point;
+	delete menu;
+}
 void GESScene::setState(PageSettings::DrawState state){
 	qobject_cast<GESPage*>(parent())->getSettings()->setState(state);
 	mState = state;
-	bool movable = ( mState != PageSettings::Edge );
 	foreach (Node *node, mGraph->nodes() )
-		node->setFlag(QGraphicsItem::ItemIsMovable, movable);
+		node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
 }
 
 void GESScene::setGraph( Graph* gr ){
 	mGraph = gr;
 	mGraph->setScene(this);
 }
+
+void GESScene::add( Edge* edge ){
+	addItem( edge );
+}
+void GESScene::add( Node* node ){
+	addItem( node );
+	node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
+}
+
 
 void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	QGraphicsScene::mousePressEvent(mouseEvent);
@@ -149,7 +162,7 @@ void GESScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 					QList<QGraphicsItem*> a;
 					a << edge;
 					addItemCommand* command = new addItemCommand(toGraph(a), mGraph);
-					stackCommand->push(command);
+					stackCommand.push(command);
 				}
 			}
 		}
@@ -223,7 +236,7 @@ void GESScene::setName() {
 
 	if (dialog.exec()) {
 		setTextCommand* command = new setTextCommand(node, lineEdit->text());
-		stackCommand->push(command);
+		stackCommand.push(command);
 		node->update();
 	}
 }
@@ -235,7 +248,7 @@ void GESScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) {
 		QList<QGraphicsItem*> a;
 		a << node;
 		addItemCommand* command = new addItemCommand(toGraph(a), mGraph);
-		stackCommand->push(command);
+		stackCommand.push(command);
 		QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
 	}
 }
@@ -247,7 +260,7 @@ void GESScene::copyObj() {
 	GESFileWriter writer;
 	Graph* graph = toGraph( Buf );
 	graph->fixEdge();
-	QByteArray* bt = &writer.writeToByte( graph );
+	QByteArray* bt = &writer.writeGraphToByte( graph );
 	mData->setData("Graph Editor Sloth/items", (*bt));
 	QClipboard *pastebuf = QApplication::clipboard();
 	pastebuf->setMimeData(mData);
@@ -266,7 +279,7 @@ void GESScene::pasteObj() {
 		loader.showError();
 
 	addItemCommand* command = new addItemCommand(pasteGr, mGraph);
-	stackCommand->push(command);
+	stackCommand.push(command);
 }
 
 //! Копировать элементы
@@ -281,17 +294,17 @@ void GESScene::selectAll() {
 }
 
 void GESScene::undoCommand() {
-	stackCommand->undo();
+	stackCommand.undo();
 }
 
 void GESScene::redoCommand() {
-	stackCommand->redo();
+	stackCommand.redo();
 }
 
 void GESScene::deleteSelectedObj() {
 	currentList = selectedItems();
 	delItemCommand* command = new delItemCommand(toGraph(currentList), mGraph);
-	stackCommand->push(command);
+	stackCommand.push(command);
 	//deleteObj();
 }
 
@@ -299,7 +312,7 @@ void GESScene::deleteUnderMouseObj() {
 	QList<QGraphicsItem*> a;
 	a << currentItem;
 	delItemCommand* command = new delItemCommand(toGraph(a), mGraph);
-	stackCommand->push(command);
+	stackCommand.push(command);
 	//deleteObj();
 }
 
@@ -315,4 +328,12 @@ Graph* GESScene::toGraph( QList<QGraphicsItem*>& itemList ){
 		}
 	}
 	return retGraph;
+}
+
+void GESScene::renderToImage(QPainter *painter, const QRectF &target, const QRectF &source)
+{
+    QBrush brush = backgroundBrush();
+    setBackgroundBrush(QBrush(Qt::NoBrush));
+    render(painter, target, source, Qt::KeepAspectRatioByExpanding);
+    setBackgroundBrush(brush);
 }

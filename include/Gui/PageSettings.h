@@ -30,6 +30,9 @@
 #ifndef PAGESETTINGS_H_
 #define PAGESETTINGS_H_
 
+#include <QRectF>
+#include "Macros.h"
+
 class PageSettings {
 public:
 	PageSettings();
@@ -52,8 +55,16 @@ public:
 		return mZoom;
 	}
 
+	void setSceneRect( QRectF _r ){
+		mRect = _r;
+	}
+	QRectF getSceneRect(){
+		return mRect;
+	}
+
 	DrawState mState;
 	int mZoom;
+	QRectF mRect;
 };
 
 #endif /* PAGESETTINGS_H_ */
