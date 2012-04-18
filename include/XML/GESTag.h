@@ -35,14 +35,15 @@
 namespace tag {
 	const QString XML_POINTF("pointf");
 
-	const QString XML_GRAPH("graph");
-		const QString XML_EDGE("edge");
-		const QString XML_NODE("node");
+	const QString XML_PAGE("page");
+		const QString XML_GRAPH("graph");
+			const QString XML_EDGE("edge");
+			const QString XML_NODE("node");
 
-	const QString XML_SETTINGS("settings");
-		const QString XML_SCENE_RECT("sc_rect");
-			const QString XML_SIZE("size");
-			const QString XML_CENTER("center");
+		const QString XML_SETTINGS("settings");
+			const QString XML_SCENE_RECT("sc_rect");
+				const QString XML_SIZE("size");
+				const QString XML_CENTER("center");
 }
 
 namespace attr {

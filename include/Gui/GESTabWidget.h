@@ -44,8 +44,8 @@ public:
 	GESTabWidget( );
 	~GESTabWidget();
 
-	void addPage();
-	void addPage(QString& name, Graph*);
+	void addNewPage();
+	void addPage( GESPage* page );
 	void removePage(int index);
 
 	QImage* getSceneImage();

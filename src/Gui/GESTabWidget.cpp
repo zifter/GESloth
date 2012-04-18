@@ -41,15 +41,12 @@ GESTabWidget::~GESTabWidget() {
 
 }
 
-void GESTabWidget::addPage(){
+void GESTabWidget::addNewPage(){
 	addTab(new GESPage( this ), tr("New page"));
 }
 
-void GESTabWidget::addPage( QString& name, Graph* graph ){
-	GESPage* page = new GESPage( this );
-	page->setFileName( name );
-	page->getScene()->setGraph( graph );
-	addTab( page, name );
+void GESTabWidget::addPage( GESPage* page ){
+	addTab( page , page->getFileName() );
 }
 
 void GESTabWidget::removePage(int index){

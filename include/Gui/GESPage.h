@@ -40,7 +40,7 @@ class GESTabWidget;
 class GESPage : public QWidget {
 	Q_OBJECT
 public:
-	GESPage( GESTabWidget* prnt );
+	explicit GESPage( GESTabWidget* prnt );
 	~GESPage();
 
     //! Сцена

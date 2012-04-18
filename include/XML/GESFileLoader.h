@@ -30,29 +30,43 @@
 #ifndef GESFILELOADER_H_
 #define GESFILELOADER_H_
 
-#include "GESTag.h"
+#include <QByteArray>
+#include <qdom.h>
+
+#include "XML/GESTag.h"
+
+#include "Gui/PageSettings.h"
+#include "Gui/GESPage.h"
+
 #include "Graph/Graph.h"
 #include "Graph/Node.h"
 #include "Graph/Edge.h"
-#include <QByteArray>
 
 class GESFileLoader {
 public:
 	GESFileLoader();
 	~GESFileLoader();
 
-	bool load(Graph*& graph, const QString& name);
-	bool load(Graph*& graph, const QByteArray& bt);
+	bool load(GESPage*& page);
+	bool loadFromByte(Graph*& graph, const QByteArray& bt);
 
 	void showError();
 
 protected:
+	bool parseGraph( QDomElement& root, Graph*& graph );
+
 	bool parseNode(QDomElement& node, QMap<int, Node*>& list);
 	bool parseEdge(QDomElement& edge, QMap<int, Node*>& list
 			, QList<Edge*>& edges);
 
+	bool parsePointF( QDomElement& node, QPointF& point );
+	bool parseSettings( QDomElement& node, PageSettings* set );
+
+	void missingAttr( const QString& tag, const QString& attr, int line  );
+
 private	:
 	QString mErrorMessage;
+	QDomDocument mDocument;
 
 };
 

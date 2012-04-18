@@ -27,14 +27,13 @@
  *      Author: zifter
  */
 
-#include "XML/GESFileLoader.h"
-
-#include "Macros.h"
-
 #include <QApplication>
 #include <QMessageBox>
 #include <QFile>
-#include <qdom.h>
+
+#include "XML/GESFileLoader.h"
+
+#include "Macros.h"
 
 GESFileLoader::GESFileLoader() {
 
@@ -47,51 +46,83 @@ void GESFileLoader::showError() {
 	QMessageBox::information(0, qAppName(), mErrorMessage);
 }
 
-bool GESFileLoader::load(Graph*& graph, const QString& name) {
-	QFile fileIn(name);
+bool GESFileLoader::load(GESPage*& page) {
+	QFile fileIn(page->getFileName());
 
 	if (!fileIn.open(QFile::ReadOnly | QFile::Text)) {
 		mErrorMessage = QObject::tr("Error while opening file.");
 		return false;
 	}
+
 	QByteArray bt = fileIn.readAll();
 
-	return load(graph, bt);
-}
-bool GESFileLoader::load(Graph*& graph, const QByteArray& bt) {
 	QString errorStr;
 	int errorLine;
 	int errorColumn;
 
-	QDomDocument document;
-	if (!document.setContent(bt, &errorStr, &errorLine, &errorColumn)) {
+	if (!mDocument.setContent(bt, &errorStr, &errorLine, &errorColumn)) {
 		mErrorMessage = QObject::tr(
 				"There was an error setting the contents of the XML model.");
 		return false;
 	}
 
-	QDomElement root = document.documentElement();
-	if (root.tagName() != tag::XML_GRAPH) {
+	QDomElement root = mDocument.documentElement();
+
+	if (root.tagName() != tag::XML_PAGE) {
 		mErrorMessage = QObject::tr("The unknown contents of the XML model");
 		return false;
 	}
 
+	QDomElement element = root.firstChildElement(tag::XML_GRAPH);
+
+	Graph* gr = new Graph;
+
+	if (!parseGraph(element, gr))
+		return false;
+	else
+		page->getScene()->setGraph(gr);
+	return true;
+}
+
+bool GESFileLoader::loadFromByte(Graph*& graph, const QByteArray& bt) {
+	QString errorStr;
+	int errorLine;
+	int errorColumn;
+
+	if (!mDocument.setContent(bt, &errorStr, &errorLine, &errorColumn)) {
+		mErrorMessage = QObject::tr(
+				"There was an error setting the contents of the XML model.");
+		return false;
+	}
+
+	QDomElement root = mDocument.documentElement();
+
+	return parseGraph(root, graph);
+
+}
+
+bool GESFileLoader::parseGraph(QDomElement& root, Graph*& graph) {
+	if (root.tagName() != tag::XML_GRAPH) {
+		mErrorMessage = QObject::tr("The unknown contents of the XML model");
+		return false;
+	}
 	QMap<int, Node*> nodes;
 	QList<Edge*> edges;
 
-	QDomElement element = root.firstChildElement(tag::XML_NODE);
-	while (!element.isNull()) {
+	QDomNodeList domNodes = root.elementsByTagName(tag::XML_NODE);
+	for (int i = 0; i < domNodes.count(); ++i) {
+		QDomElement element = domNodes.at(i).toElement();
 		if (!parseNode(element, nodes)) {
 			return false;
 		}
-		element = element.nextSiblingElement(tag::XML_NODE);
 	}
-	element = root.firstChildElement("edge");
-	while (!element.isNull()) {
+
+	QDomNodeList domEdges = root.elementsByTagName(tag::XML_EDGE);
+	for (int i = 0; i < domEdges.count(); ++i) {
+		QDomElement element = domEdges.at(i).toElement();
 		if (!parseEdge(element, nodes, edges)) {
 			return false;
 		}
-		element = element.nextSiblingElement("edge");
 	}
 
 	foreach( Node* node, nodes.values() )
@@ -104,7 +135,34 @@ bool GESFileLoader::load(Graph*& graph, const QByteArray& bt) {
 	}
 
 	return true;
+}
 
+bool GESFileLoader::parsePointF(QDomElement& root, QPointF& point) {
+	QDomElement node = root.firstChildElement(tag::XML_POINTF);
+	QString sAttr = attr::XML_X;
+	bool parseRezult = node.hasAttribute(sAttr);
+
+	if (parseRezult) {
+		QString valX = node.attribute(sAttr);
+		sAttr = attr::XML_Y;
+		parseRezult = node.hasAttribute(sAttr);
+
+		if (parseRezult) {
+			QString valY = node.attribute(sAttr);
+
+			point.setX(valX.toDouble());
+			point.setY(valY.toDouble());
+		}
+	}
+
+	if (!parseRezult)
+		missingAttr(tag::XML_CENTER, sAttr, node.lineNumber());
+
+	return true;
+}
+
+bool GESFileLoader::parseSettings(QDomElement& node, PageSettings*) {
+	return true;
 }
 
 bool GESFileLoader::parseNode(QDomElement& node, QMap<int, Node*>& list) {
@@ -115,7 +173,7 @@ bool GESFileLoader::parseNode(QDomElement& node, QMap<int, Node*>& list) {
 
 		QString text = node.attribute(sAttr);
 		sAttr = attr::XML_ID;
-		parseRezult = node.hasAttribute(attr::XML_ID);
+		parseRezult = node.hasAttribute(sAttr);
 
 		if (parseRezult) {
 			QString id = node.attribute(attr::XML_ID);
@@ -123,28 +181,23 @@ bool GESFileLoader::parseNode(QDomElement& node, QMap<int, Node*>& list) {
 			nd->setText(text);
 			list.insert(id.toInt(), nd);
 
-			sAttr = attr::XML_X;
-			parseRezult = node.hasAttribute(attr::XML_X) && node.hasAttribute(attr::XML_X);
-			if( parseRezult ){
-				QString valX = node.attribute(sAttr);
-				QString valY = node.attribute(sAttr);
+			QPointF point;
 
-				nd->setPos( valX.toDouble(), valY.toDouble() );
-			}
+			node = node.firstChildElement(tag::XML_CENTER);
+
+			if (!parsePointF(node, point))
+				return false;
+			nd->setPos(point);
 		}
 	}
 
 	if (!parseRezult)
-		mErrorMessage =
-				QObject::tr(
-						"Tag with name %1 doesn't have attribute %2  in line %3 in XML model.").arg(
-						tag::XML_NODE).arg(sAttr).arg(node.lineNumber());
+		missingAttr(tag::XML_NODE, sAttr, node.lineNumber());
 	return parseRezult;
 }
 
 bool GESFileLoader::parseEdge(QDomElement& edge, QMap<int, Node*>& list
 		, QList<Edge*>& edges) {
-
 	QString sAttr = attr::XML_TEXT;
 	bool parseRezult = edge.hasAttribute(attr::XML_TEXT);
 
@@ -175,7 +228,8 @@ bool GESFileLoader::parseEdge(QDomElement& edge, QMap<int, Node*>& list
 					edges << ed;
 					return true;
 				} else {
-					mErrorMessage = QObject::tr( "The unknown id of node in XML model.");
+					mErrorMessage = QObject::tr(
+							"The unknown id of node in XML model.");
 					return false;
 				}
 
@@ -183,8 +237,14 @@ bool GESFileLoader::parseEdge(QDomElement& edge, QMap<int, Node*>& list
 		}
 	}
 	if (!parseRezult)
-		mErrorMessage = QObject::tr(
-				"Tag with name %1 doesn't have attribute %2  in line %3 in XML model.").arg(
-				tag::XML_EDGE).arg(sAttr).arg(edge.lineNumber());
+		missingAttr(tag::XML_EDGE, sAttr, edge.lineNumber());
 	return false;
+}
+
+void GESFileLoader::missingAttr(const QString& tag, const QString& attr,
+		int line) {
+	mErrorMessage =
+			QObject::tr(
+					"Tag with name %1 doesn't have attribute %2  in line %3 in XML model.").arg(
+					tag).arg(attr).arg(line);
 }

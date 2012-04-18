@@ -49,7 +49,7 @@ class GESScene: public QGraphicsScene {
 Q_OBJECT
 
 public:
-	GESScene(GESPage* prnt);
+	explicit GESScene(GESPage* prnt);
 	virtual ~GESScene();
 
 	void setGraph(Graph* gr);

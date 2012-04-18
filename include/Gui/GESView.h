@@ -42,8 +42,7 @@ class GESView : public QGraphicsView
     Q_OBJECT
 
 public:
-    //! Пустой конструктоh
-    GESView( GESPage* prnt );
+    explicit GESView( GESPage* prnt );
     virtual ~GESView();
 
    void setScene( GESScene* scene );

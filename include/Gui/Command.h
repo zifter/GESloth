@@ -38,7 +38,7 @@ class addItemCommand: public QUndoCommand {
 public:
 
 	//! Конструктор команды
-	addItemCommand(Graph* changeGraph, Graph* defGraph) :
+	explicit addItemCommand(Graph* changeGraph, Graph* defGraph) :
 			change(changeGraph), mGraph(defGraph) {
 	}
 
@@ -62,7 +62,7 @@ class delItemCommand: public QUndoCommand {
 public:
 
 	//! Конструктор команды
-	delItemCommand(Graph* changeGraph, Graph* defGraph) :
+	explicit delItemCommand(Graph* changeGraph, Graph* defGraph) :
 			change(changeGraph), mGraph(defGraph) {
 	}
 
@@ -85,7 +85,7 @@ class setTextCommand: public QUndoCommand {
 public:
 
 	//! Коструктор команды
-	setTextCommand(Object* obj, QString text) :
+	explicit setTextCommand(Object* obj, QString text) :
 			SetableText(text), PastText(obj->getText()) {
 		object = obj;
 	}

@@ -56,11 +56,12 @@ void GESFileWriter::write(GESPage* page) {
 	mStream.setCodec(codec);
 	mStream.setAutoFormatting(true);
 	mStream.writeStartDocument();
+	mStream.writeStartElement(tag::XML_PAGE);
 
-	writeGraph(page->getScene()->getGraph());
+		writeGraph(page->getScene()->getGraph());
+		writeSettings( page->getSettings() );
 
-	writeSettings( page->getSettings() );
-
+	mStream.writeEndElement();
 	mStream.writeEndDocument();
 
 	fileOut.write(mByte);
@@ -110,20 +111,6 @@ void GESFileWriter::writeGraph(Graph* graph) {
 
 void GESFileWriter::writeSettings(PageSettings* set) {
 	mStream.writeStartElement(tag::XML_SETTINGS);
-
-		// scene rect
-		mStream.writeStartElement(tag::XML_SCENE_RECT);
-
-			mStream.writeStartElement(tag::XML_SIZE);
-				QSizeF size = set->getSceneRect().size();
-				writePointF( QPointF( size.width(), size.height() ) );
-			mStream.writeEndElement();
-
-			mStream.writeStartElement(tag::XML_CENTER);
-				writePointF( set->getSceneRect().center());
-			mStream.writeEndElement();
-
-		mStream.writeEndElement();
 
 	mStream.writeEndElement();
 }

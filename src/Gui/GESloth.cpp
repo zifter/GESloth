@@ -447,12 +447,13 @@ void GESloth::Open() {
 		return;
 
 	GESFileLoader loader;
-	Graph* graph = new Graph();
-	if (!loader.load(graph, FileName))
+	GESPage* page = new GESPage( mTabWidget );
+	page->setFileName( FileName );
+	if (!loader.load(page) )
 		loader.showError();
 	if( !isActiveToolBar )
 		activateToolBar();
-	mTabWidget->addPage(FileName, graph);
+	mTabWidget->addPage(page);
 
 }
 
@@ -500,7 +501,7 @@ QIcon GESloth::getIcon(const QString& name) {
 void GESloth::newPage() {
 	if( !isActiveToolBar )
 		activateToolBar();
-	mTabWidget->addPage();
+	mTabWidget->addNewPage();
 }
 
 void GESloth::viewScaleChanged(int newScale) {

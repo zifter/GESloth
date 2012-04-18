@@ -127,7 +127,6 @@ void GESView::updateSceneRect(const QRectF& rect) {
 		QRectF result = rect.adjusted(-100, -100, 100, 100).unite(vis).unite(
 				sceneRect());
 		setSceneRect(result);
-		qobject_cast<GESPage*>(parent())->getSettings()->setSceneRect( result );
 
 		emit sceneRectChanged(result);
 	}

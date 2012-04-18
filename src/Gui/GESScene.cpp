@@ -275,7 +275,7 @@ void GESScene::pasteObj() {
 
 	GESFileLoader loader;
 	Graph* pasteGr = new Graph();
-	if( !loader.load( pasteGr, bt ) )
+	if( !loader.loadFromByte( pasteGr, bt ) )
 		loader.showError();
 
 	addItemCommand* command = new addItemCommand(pasteGr, mGraph);
