@@ -21,38 +21,30 @@
  ****************************************************************************/
 
 /*
- * GESTag.h
+ * InsertModeEventHandler.h
  *
- *  Created on: Apr 16, 2012
+ *  Created on: Apr 19, 2012
  *      Author: zifter
  */
 
-#ifndef GESTAG_H_
-#define GESTAG_H_
+#ifndef INSERTMODEEVENTHANDLER_H_
+#define INSERTMODEEVENTHANDLER_H_
 
-#include <QString>
+#include "Gui/SceneEventHandler/AbstractSceneEventHandler.h"
 
-namespace tag {
-	const QString XML_POINTF("pointf");
+class InsertModeEventHandler : public AbstractSceneEventHandler {
+public:
+	explicit InsertModeEventHandler(  GESScene* sc );
+	~InsertModeEventHandler();
 
-	const QString XML_PAGE("page");
-		const QString XML_GRAPH("graph");
-			const QString XML_EDGE("edge");
-			const QString XML_NODE("node");
+	//! Событие нажатия кнопки
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
-		const QString XML_SETTINGS("settings");
-			const QString XML_SCENE_RECT("sc_rect");
-				const QString XML_SIZE("size");
-				const QString XML_CENTER("center");
-}
+	//! Событие двежение зажатой мышки
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
-namespace attr {
-	const QString XML_TEXT("text");
-	const QString XML_ID("id");
-	const QString XML_ID_SOURCE("idsource");
-	const QString XML_ID_DEST("iddest");
-	const QString XML_X("x");
-	const QString XML_Y("y");
-}
+	//! Событие отпускание кнопки
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+};
 
-#endif /* GESTAG_H_ */
+#endif /* INSERTMODEEVENTHANDLER_H_ */

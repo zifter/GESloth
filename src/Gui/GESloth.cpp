@@ -102,8 +102,8 @@ void GESloth::createToolBar() {
 	linePointerButton->setIcon(getIcon("linepointer"));
 	linePointerButton->setToolTip(tr("Edge mode"));
 
-	mToolGroup->addButton(pointerButton, int(PageSettings::Node));
-	mToolGroup->addButton(linePointerButton, int(PageSettings::Edge));
+	mToolGroup->addButton(pointerButton, int(GESScene::NodeMode));
+	mToolGroup->addButton(linePointerButton, int(GESScene::EdgeMode));
 	connect(mToolGroup, SIGNAL(buttonClicked(int)), mTabWidget,
 			SLOT(setSceneState(int)));
 
@@ -447,7 +447,7 @@ void GESloth::Open() {
 		return;
 
 	GESFileLoader loader;
-	GESPage* page = new GESPage( mTabWidget );
+	GESPage* page = new GESPage( mTabWidget);
 	page->setFileName( FileName );
 	if (!loader.load(page) )
 		loader.showError();

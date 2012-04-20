@@ -4,6 +4,8 @@ QT_VERSION = Qt \
 QT += core \
     gui \
     xml
+    
+#CONFIG += debug
 CONFIG(debug, debug|release) { 
     # Set destination path, where we put our executable file
     DESTDIR = build/debug/bin/
@@ -41,7 +43,11 @@ SUBDIRS = src/ \
 RCC_DIR = media/
 
 # Set header
-HEADERS += include/Algorithm/AbstractAlgorithm.h \
+HEADERS += include/Gui/SceneEventHandler/InsertModeEventHandler.h \
+    include/Gui/SceneEventHandler/EdgeModeEventHandler.h \
+    include/Gui/SceneEventHandler/NodeModeEventHandler.h \
+    include/Gui/SceneEventHandler/AbstractSceneEventHandler.h \
+    include/Algorithm/AbstractAlgorithm.h \
     include/Gui/Command.h \
     include/Gui/PageSettings.h \
     include/XML/GESFileLoader.h \
@@ -60,7 +66,10 @@ HEADERS += include/Algorithm/AbstractAlgorithm.h \
     include/Graph/Object.h
 
 # Set source
-SOURCES += src/Algorithm/AbstractAlgorithm.cpp \
+SOURCES += src/Gui/SceneEventHandler/InsertModeEventHandler.cpp \
+    src/Gui/SceneEventHandler/EdgeModeEventHandler.cpp \
+    src/Gui/SceneEventHandler/NodeModeEventHandler.cpp \
+    src/Algorithm/AbstractAlgorithm.cpp \
     src/Gui/Command.cpp \
     src/Gui/PageSettings.cpp \
     src/Gui/GESPage.cpp \
@@ -74,8 +83,8 @@ SOURCES += src/Algorithm/AbstractAlgorithm.cpp \
     src/Graph/Node.cpp \
     src/Graph/Graph.cpp \
     src/Graph/Object.cpp \
-	src/HelpBrowser.cpp \
-	src/main.cpp
+    src/HelpBrowser.cpp \
+    src/main.cpp
 
 # Set translations
 TRANSLATIONS += media/translations/graphicsRedactor_ru.ts \

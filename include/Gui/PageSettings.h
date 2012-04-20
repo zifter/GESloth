@@ -31,20 +31,19 @@
 #define PAGESETTINGS_H_
 
 #include <QRectF>
+
 #include "Macros.h"
+#include "Gui/GESScene.h"
 
 class PageSettings {
 public:
 	PageSettings();
 	~PageSettings();
-	enum DrawState{
-		Node, Edge
-	};
 
-	void setState(DrawState st ){
+	void setState(GESScene::EditMode st ){
 		mState = st;
 	}
-	DrawState getState() const{
+	GESScene::EditMode getState() const{
 		return mState;
 	}
 
@@ -55,7 +54,7 @@ public:
 		return mZoom;
 	}
 
-	DrawState mState;
+	GESScene::EditMode mState;
 	int mZoom;
 };
 

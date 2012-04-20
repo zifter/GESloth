@@ -28,8 +28,9 @@
 #include <QMimeData>
 #include <QGraphicsView>
 #include <QUndoStack>
+#include <QVector>
 
-#include "PageSettings.h"
+#include "Gui/SceneEventHandler/AbstractSceneEventHandler.h"
 
 class GESloth;
 class Node;
@@ -44,6 +45,10 @@ class QWheelEvent;
 class QComboBox;
 class Graph;
 class GESPage;
+class NodeModeEventHandler;
+class InstertModeEventHandler;
+class EdgeeModeEventHandler;
+class PageSettings;
 
 class GESScene: public QGraphicsScene {
 Q_OBJECT
@@ -51,6 +56,15 @@ Q_OBJECT
 public:
 	explicit GESScene(GESPage* prnt);
 	virtual ~GESScene();
+
+	enum EditMode{
+		NoneMode = 0 ,
+		NodeMode,
+		EdgeMode,
+		InsertMode,
+
+		LAST
+	};
 
 	void setGraph(Graph* gr);
 
@@ -63,9 +77,35 @@ public:
 
 	void renderToImage(QPainter *painter, const QRectF &target, const QRectF &source);
 
+public:
+	/**
+	 * @brief Create node in point
+	 * @param point Center point
+	 */
+
+	void createNode( const QPointF& point );
+	/**
+	 * @brief Draw line (look like point)
+	 * @param point point where now situated mouses pointer
+	 * @param newEdge if true - draw new line, else change previous line
+	 */
+	void pre_createEdge( const QPointF& point, bool newEdge );
+
+	/**
+	 * @brief Create edge from previous info about point
+	 */
+	void createEdge();
+
+	/**
+	 * @brief Create context menu which depend from items which situated under mouse
+	 * @param scenePoint Point on scene
+	 * @param screenPoint Point on screen where we create context menu
+	 */
+	void createContextMenu( const QPointF& scenePoint, const QPoint& screenPoint );
+
 public slots:
 	//! Установка состояния
-	void setState(PageSettings::DrawState state);
+	void setState(EditMode state);
 
 	//! Удалить
 	void deleteSelectedObj();
@@ -112,23 +152,20 @@ protected:
 	//! Событие вызова контекстного меню
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-private:
-
 	Graph* toGraph(QList<QGraphicsItem*>& itemList);
 
 	//! Graph which contains on scene
 	Graph* mGraph;
 
+	EditMode mMode;
+
+	QVector< AbstractSceneEventHandler* > hanlder;
+
 	//! Линия
 	QGraphicsLineItem* line;
 
-	//! Контрольная точка
-	QPointF* point;
-
 	//! Меню
 	QMenu* menu;
-
-	PageSettings::DrawState mState;
 
 	//! Текущий элемент
 	QGraphicsItem* currentItem;

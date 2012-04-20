@@ -20,39 +20,29 @@
  **
  ****************************************************************************/
 
+
 /*
- * GESTag.h
+ * NodeModeEventHandler.h
  *
- *  Created on: Apr 16, 2012
+ *  Created on: Apr 19, 2012
  *      Author: zifter
  */
 
-#ifndef GESTAG_H_
-#define GESTAG_H_
+#ifndef NODEMODEEVENTHANDLER_H_
+#define NODEMODEEVENTHANDLER_H_
 
-#include <QString>
+#include "Gui/SceneEventHandler/AbstractSceneEventHandler.h"
 
-namespace tag {
-	const QString XML_POINTF("pointf");
+class NodeModeEventHandler : public AbstractSceneEventHandler {
+public:
+	explicit NodeModeEventHandler( GESScene* sc );
+	~NodeModeEventHandler();
 
-	const QString XML_PAGE("page");
-		const QString XML_GRAPH("graph");
-			const QString XML_EDGE("edge");
-			const QString XML_NODE("node");
+	//! Событие двойного щелчка
+	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
 
-		const QString XML_SETTINGS("settings");
-			const QString XML_SCENE_RECT("sc_rect");
-				const QString XML_SIZE("size");
-				const QString XML_CENTER("center");
-}
+	//! Событие вызова контекстного меню
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+};
 
-namespace attr {
-	const QString XML_TEXT("text");
-	const QString XML_ID("id");
-	const QString XML_ID_SOURCE("idsource");
-	const QString XML_ID_DEST("iddest");
-	const QString XML_X("x");
-	const QString XML_Y("y");
-}
-
-#endif /* GESTAG_H_ */
+#endif /* NODEMODEEVENTHANDLER_H_ */

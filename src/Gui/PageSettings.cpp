@@ -29,7 +29,7 @@
 
 #include "Gui/PageSettings.h"
 
-PageSettings::PageSettings()  : mState(Node), mZoom(100) {
+PageSettings::PageSettings()  : mState(GESScene::NodeMode), mZoom(100) {
 
 }
 

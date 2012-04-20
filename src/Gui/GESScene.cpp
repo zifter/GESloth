@@ -47,6 +47,10 @@
 #include "Gui/GESScene.h"
 #include "Gui/GESPage.h"
 #include "Gui/Command.h"
+#include "Gui/SceneEventHandler/EdgeModeEventHandler.h"
+#include "Gui/SceneEventHandler/NodeModeEventHandler.h"
+#include "Gui/SceneEventHandler/InsertModeEventHandler.h"
+
 #include "Graph/Node.h"
 #include "Graph/Edge.h"
 
@@ -56,201 +60,113 @@
 #include "Macros.h"
 
 GESScene::GESScene(GESPage *prnt) :
-		QGraphicsScene(prnt), line(NULL), point(NULL), menu(NULL) {
+		QGraphicsScene(prnt), line(NULL), menu(NULL) {
 	QPainterPath path;
 	mGraph = new Graph();
-	mGraph->setScene( this );
-	mState = PageSettings::Node;
+	mGraph->setScene(this);
+	mMode = NodeMode;
+
+	STATIC_ASSERT(LAST == 4, _COUNT_OF_EDIT_MODE_DOESNT_MATCH)
+
+	hanlder.fill(0, (int) LAST);
+
+	hanlder[NoneMode] = new AbstractSceneEventHandler(this);
+	hanlder[NodeMode] = new NodeModeEventHandler(this);
+	hanlder[EdgeMode] = new EdgeModeEventHanlder(this);
+	hanlder[InsertMode] = new InsertModeEventHandler(this);
 }
 
-GESScene::~GESScene(){
+GESScene::~GESScene() {
 	delete mGraph;
 	delete line;
-	delete point;
 	delete menu;
 }
-void GESScene::setState(PageSettings::DrawState state){
+void GESScene::setState(EditMode state) {
 	qobject_cast<GESPage*>(parent())->getSettings()->setState(state);
-	mState = state;
+	mMode = state;
 	foreach (Node *node, mGraph->nodes() )
-		node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
+		node->setFlag(QGraphicsItem::ItemIsMovable, mMode != EdgeMode);
 }
 
-void GESScene::setGraph( Graph* gr ){
+void GESScene::setGraph(Graph* gr) {
 	mGraph = gr;
 	mGraph->setScene(this);
 }
 
-void GESScene::add( Edge* edge ){
-	addItem( edge );
+void GESScene::add(Edge* edge) {
+	addItem(edge);
 }
-void GESScene::add( Node* node ){
-	addItem( node );
-	node->setFlag(QGraphicsItem::ItemIsMovable, mState != PageSettings::Edge);
+void GESScene::add(Node* node) {
+	addItem(node);
+	node->setFlag(QGraphicsItem::ItemIsMovable, mMode != EdgeMode);
 }
-
 
 void GESScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	hanlder[mMode]->mousePressEvent(mouseEvent);
 	QGraphicsScene::mousePressEvent(mouseEvent);
-	/*
-	 if(mouseEvent->button() == Qt::LeftButton)
-	 QApplication::setOverrideCursor(Qt::PointingHandCursor);
-	 */
-	if (mState == PageSettings::Edge && mouseEvent->button() == Qt::LeftButton
-			&& !items(mouseEvent->scenePos()).isEmpty()) {
-		if (items(mouseEvent->scenePos()).at(0)->type() == Node::Type) {
-			if (line != NULL) {
-				removeItem(line);
-				delete line;
-				line = NULL;
-			}
-			line = new QGraphicsLineItem(
-					QLineF(mouseEvent->scenePos(), mouseEvent->scenePos()));
-			line->setPen(QPen(Qt::black, 1));
-			addItem(line);
-		}
-	}
-
-	if (mState == PageSettings::Node) {
-		if (point != NULL) {
-			delete point;
-			point = NULL;
-		}
-		point = new QPointF(mouseEvent->scenePos());
-	}
 }
 
 void GESScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-	if (mState == PageSettings::Edge && line != NULL) {
-		QLineF newLine(line->line().p1(), mouseEvent->scenePos());
-		line->setLine(newLine);
-	}
+	hanlder[mMode]->mouseMoveEvent(mouseEvent);
 	QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 
 void GESScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-	//QApplication::restoreOverrideCursor();
-	if (mouseEvent->button() == Qt::LeftButton) {
-		if (line != 0 && mState == PageSettings::Edge) {
-
-			QList<QGraphicsItem *> startItems = items(line->line().p1());
-			if (startItems.count() && startItems.first() == line)
-				startItems.removeFirst();
-			QList<QGraphicsItem *> endItems = items(line->line().p2());
-			if (endItems.count() && endItems.first() == line)
-				endItems.removeFirst();
-
-			removeItem(line);
-			delete line;
-			line = NULL;
-
-			if (startItems.count() > 0 && endItems.count() > 0
-					&& startItems.first()->type() == Node::Type
-					&& endItems.first()->type() == Node::Type
-					&& startItems.first() != endItems.first()) {
-				Node* startNode = qgraphicsitem_cast<Node *>(
-						startItems.first());
-				Node* endNode = qgraphicsitem_cast<Node *>(endItems.first());
-				bool flag = true;
-				foreach(Edge* edge, mGraph->edges())
-					if (edge->checkEdge(startNode, endNode)) {
-						flag = false;
-						break;
-					}
-				if (flag) {
-					Edge *edge = new Edge(startNode, endNode);
-					QList<QGraphicsItem*> a;
-					a << edge;
-					addItemCommand* command = new addItemCommand(toGraph(a), mGraph);
-					stackCommand.push(command);
-				}
-			}
-		}
-	}
-	line = 0;
+	hanlder[mMode]->mouseReleaseEvent(mouseEvent);
 	QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 
 void GESScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
-	QList<QGraphicsItem*> itemsUnderMouse = items(event->scenePos(),
-			Qt::IntersectsItemShape, Qt::DescendingOrder);
-	if (menu) {
-		delete menu;
-		menu = NULL;
-	}
-	menu = new QMenu();
-	if (itemsUnderMouse.isEmpty()) {
-		menu->addAction(tr("Paste"), this, SLOT(pasteObj()),
-				QKeySequence::Paste);
-	} else {
-		currentItem = itemsUnderMouse.at(0);
-		menu->addAction(tr("Set name"), this, SLOT(setName()));
-		menu->addAction(tr("Delete"), this, SLOT(deleteUnderMouseObj()),
-				QKeySequence::Delete);
-		if (currentItem->type() == Node::Type)
-			menu->addAction(tr("Copy"), this, SLOT(copyObj()),
-					QKeySequence::Copy);
-	}
-	menu->addAction(tr("Undo"), this, SLOT(undoCommand()), QKeySequence::Undo);
-	menu->addAction(tr("Redo"), this, SLOT(redoCommand()), QKeySequence::Redo);
-	menu->addAction(tr("Select All"), this, SLOT(selectAll()),
-			QKeySequence::SelectAll);
-	menu->exec(event->screenPos());
+	hanlder[mMode]->contextMenuEvent(event);
+	QGraphicsScene::contextMenuEvent(event);
 }
 
-void GESScene::clear(){
+void GESScene::clear() {
 	mGraph->removeAll();
 }
 
 void GESScene::setName() {
 
-	QWidget* txt = new QWidget();
-	QDialog dialog(txt);
+	QWidget txt;
+	QDialog dialog(&txt);
 	dialog.setWindowTitle(tr("Set name"));
 
 	Object* node = qgraphicsitem_cast<Object*>(currentItem);
 
-	QLabel* label = new QLabel(tr("Name:"), &dialog);
-	QLineEdit* lineEdit = new QLineEdit(&dialog);
+	QLabel label(tr("Name:"), &dialog);
+	QLineEdit lineEdit(&dialog);
 
-	QDialogButtonBox* buttonBox = new QDialogButtonBox(
+	QDialogButtonBox buttonBox(
 			QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	buttonBox->setParent(&dialog);
+	buttonBox.setParent(&dialog);
 
-	connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-	connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+	connect(&buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+	connect(&buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-	QVBoxLayout *layout = new QVBoxLayout;
-	layout->addWidget(label);
-	layout->addWidget(lineEdit);
-	layout->addWidget(buttonBox);
+	QVBoxLayout layout;
+	layout.addWidget(&label);
+	layout.addWidget(&lineEdit);
+	layout.addWidget(&buttonBox);
 
-	QCompleter *completer = new QCompleter();
-	completer->setCaseSensitivity(Qt::CaseInsensitive);
-	lineEdit->setCompleter(completer);
-	lineEdit->setText(node->getText());
-	lineEdit->selectAll();
+	QCompleter completer;
+	completer.setCaseSensitivity(Qt::CaseInsensitive);
+	lineEdit.setCompleter(&completer);
+	lineEdit.setText(node->getText());
+	lineEdit.selectAll();
 
-	dialog.setLayout(layout);
-	lineEdit->setFocus();
+	dialog.setLayout(&layout);
+	lineEdit.setFocus();
 
 	if (dialog.exec()) {
-		setTextCommand* command = new setTextCommand(node, lineEdit->text());
+		setTextCommand* command = new setTextCommand(node, lineEdit.text());
 		stackCommand.push(command);
 		node->update();
 	}
 }
 
 void GESScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) {
-	if (mouseEvent->button() == Qt::LeftButton && mState == PageSettings::Node) {
-		Node *node = new Node(0);
-		node->setPos(mouseEvent->scenePos());
-		QList<QGraphicsItem*> a;
-		a << node;
-		addItemCommand* command = new addItemCommand(toGraph(a), mGraph);
-		stackCommand.push(command);
-		QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
-	}
+	hanlder[mMode]->mouseDoubleClickEvent(mouseEvent);
+	QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
 }
 
 void GESScene::copyObj() {
@@ -258,12 +174,13 @@ void GESScene::copyObj() {
 
 	QMimeData *mData = new QMimeData;
 	GESFileWriter writer;
-	Graph* graph = toGraph( Buf );
+	Graph* graph = toGraph(Buf);
 	graph->fixEdge();
-	QByteArray* bt = &writer.writeGraphToByte( graph );
+	QByteArray* bt = &writer.writeGraphToByte(graph);
 	mData->setData("Graph Editor Sloth/items", (*bt));
 	QClipboard *pastebuf = QApplication::clipboard();
 	pastebuf->setMimeData(mData);
+	mMode = InsertMode;
 }
 
 void GESScene::pasteObj() {
@@ -271,11 +188,12 @@ void GESScene::pasteObj() {
 			"Graph Editor Sloth/items")))
 		return;
 	QByteArray bt;
-	bt = QApplication::clipboard()->mimeData()->data("Graph Editor Sloth/items");
+	bt = QApplication::clipboard()->mimeData()->data(
+			"Graph Editor Sloth/items");
 
 	GESFileLoader loader;
 	Graph* pasteGr = new Graph();
-	if( !loader.loadFromByte( pasteGr, bt ) )
+	if (!loader.loadFromByte(pasteGr, bt))
 		loader.showError();
 
 	addItemCommand* command = new addItemCommand(pasteGr, mGraph);
@@ -316,24 +234,113 @@ void GESScene::deleteUnderMouseObj() {
 	//deleteObj();
 }
 
-Graph* GESScene::toGraph( QList<QGraphicsItem*>& itemList ){
+Graph* GESScene::toGraph(QList<QGraphicsItem*>& itemList) {
 	Graph* retGraph = new Graph();
-	foreach(QGraphicsItem *item, itemList)
-	{
-		if (item->type() == Node::Type) {
+	foreach(QGraphicsItem *item, itemList) {
+		if (item->type() == Node::Type)
 			retGraph->add(qgraphicsitem_cast<Node*>(item));
-		}
-		if (item->type() == Edge::Type) {
+		if (item->type() == Edge::Type)
 			retGraph->add(qgraphicsitem_cast<Edge*>(item));
-		}
 	}
 	return retGraph;
 }
 
-void GESScene::renderToImage(QPainter *painter, const QRectF &target, const QRectF &source)
-{
-    QBrush brush = backgroundBrush();
-    setBackgroundBrush(QBrush(Qt::NoBrush));
-    render(painter, target, source, Qt::KeepAspectRatioByExpanding);
-    setBackgroundBrush(brush);
+void GESScene::renderToImage(QPainter *painter, const QRectF &target,
+		const QRectF &source) {
+	QBrush brush = backgroundBrush();
+	setBackgroundBrush(QBrush(Qt::NoBrush));
+	render(painter, target, source, Qt::KeepAspectRatioByExpanding);
+	setBackgroundBrush(brush);
+}
+
+void GESScene::pre_createEdge(const QPointF& p, bool newEdge) {
+	if (newEdge) {
+		if (line != 0) {
+			removeItem(line);
+			delete line;
+			line = 0;
+		}
+		line = new QGraphicsLineItem(QLineF(p, p));
+		line->setPen(QPen(Qt::black, 1));
+		addItem(line);
+	} else if (line != 0) {
+		QLineF newLine(line->line().p1(), p);
+		line->setLine(newLine);
+	}
+}
+
+void GESScene::createEdge() {
+	if (line != 0) {
+
+		QList<QGraphicsItem *> startItems = items(line->line().p1());
+		if (startItems.count() && startItems.first() == line)
+			startItems.removeFirst();
+		QList<QGraphicsItem *> endItems = items(line->line().p2());
+		if (endItems.count() && endItems.first() == line)
+			endItems.removeFirst();
+
+		removeItem(line);
+		delete line;
+		line = NULL;
+
+		if (startItems.count() > 0 && endItems.count() > 0
+				&& startItems.first()->type() == Node::Type
+				&& endItems.first()->type() == Node::Type
+				&& startItems.first() != endItems.first()) {
+			Node* startNode = qgraphicsitem_cast<Node *>(startItems.first());
+			Node* endNode = qgraphicsitem_cast<Node *>(endItems.first());
+			bool flag = true;
+			foreach(Edge* edge, mGraph->edges())
+				if (edge->checkEdge(startNode, endNode)) {
+					flag = false;
+					break;
+				}
+			if (flag) {
+				Edge *edge = new Edge(startNode, endNode);
+				QList<QGraphicsItem*> a;
+				a << edge;
+				addItemCommand* command = new addItemCommand(toGraph(a),
+						mGraph);
+				stackCommand.push(command);
+			}
+		}
+	}
+	line = 0;
+}
+
+void GESScene::createNode(const QPointF& point) {
+	Node *node = new Node(0);
+	node->setPos(point);
+	QList<QGraphicsItem*> a;
+	a << node;
+	addItemCommand* command = new addItemCommand(toGraph(a), mGraph);
+	stackCommand.push(command);
+}
+
+void GESScene::createContextMenu(const QPointF& scenePoint,
+		const QPoint& screenPoint) {
+	QList<QGraphicsItem*> itemsUnderMouse = items(scenePoint,
+			Qt::IntersectsItemShape, Qt::DescendingOrder);
+	if (menu) {
+		delete menu;
+		menu = NULL;
+	}
+	menu = new QMenu();
+	if (itemsUnderMouse.isEmpty()) {
+		menu->addAction(tr("Paste"), this, SLOT(pasteObj()),
+				QKeySequence::Paste);
+	} else {
+		currentItem = itemsUnderMouse.at(0);
+		menu->addAction(tr("Set name"), this, SLOT(setName()));
+		menu->addAction(tr("Delete"), this, SLOT(deleteUnderMouseObj()),
+				QKeySequence::Delete);
+		if (currentItem->type() == Node::Type)
+			menu->addAction(tr("Copy"), this, SLOT(copyObj()),
+					QKeySequence::Copy);
+	}
+	menu->addAction(tr("Undo"), this, SLOT(undoCommand()), QKeySequence::Undo);
+	menu->addAction(tr("Redo"), this, SLOT(redoCommand()), QKeySequence::Redo);
+	menu->addAction(tr("Select All"), this, SLOT(selectAll()),
+			QKeySequence::SelectAll);
+	menu->exec(screenPoint);
 }

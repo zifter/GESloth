@@ -21,38 +21,30 @@
  ****************************************************************************/
 
 /*
- * GESTag.h
+ * InsertModeEventHandler.cpp
  *
- *  Created on: Apr 16, 2012
+ *  Created on: Apr 19, 2012
  *      Author: zifter
  */
 
-#ifndef GESTAG_H_
-#define GESTAG_H_
+#include "Gui/SceneEventHandler/InsertModeEventHandler.h"
+#include "Macros.h"
 
-#include <QString>
+InsertModeEventHandler::InsertModeEventHandler( GESScene* sc ) : AbstractSceneEventHandler(sc) {
 
-namespace tag {
-	const QString XML_POINTF("pointf");
-
-	const QString XML_PAGE("page");
-		const QString XML_GRAPH("graph");
-			const QString XML_EDGE("edge");
-			const QString XML_NODE("node");
-
-		const QString XML_SETTINGS("settings");
-			const QString XML_SCENE_RECT("sc_rect");
-				const QString XML_SIZE("size");
-				const QString XML_CENTER("center");
 }
 
-namespace attr {
-	const QString XML_TEXT("text");
-	const QString XML_ID("id");
-	const QString XML_ID_SOURCE("idsource");
-	const QString XML_ID_DEST("iddest");
-	const QString XML_X("x");
-	const QString XML_Y("y");
+InsertModeEventHandler::~InsertModeEventHandler() {
 }
 
-#endif /* GESTAG_H_ */
+void InsertModeEventHandler::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent){
+	PRINT("")
+}
+
+void InsertModeEventHandler::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent){
+	PRINT("")
+}
+
+void InsertModeEventHandler::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent){
+	PRINT("")
+}
