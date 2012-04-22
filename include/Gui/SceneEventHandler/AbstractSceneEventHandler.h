@@ -31,22 +31,31 @@
 #define ABSTRACTSCENEEVENTHANDLER_H_
 
 #include <QGraphicsSceneMouseEvent>
-
-class GESScene;
+#include "Gui/GESScene.h"
 
 class AbstractSceneEventHandler {
 public:
-	explicit AbstractSceneEventHandler( GESScene* sc ){
+	explicit AbstractSceneEventHandler(GESScene* sc) {
 		mScene = sc;
 	}
-	virtual ~AbstractSceneEventHandler(){}
+	virtual ~AbstractSceneEventHandler() {
+	}
 
-	GESScene* getScene() const{
+	GESScene* getScene() const {
 		return mScene;
 	}
 
-	void setScene( GESScene* sc ){
+	void setScene(GESScene* sc) {
 		mScene = sc;
+	}
+
+	GESScene::EditMode getEditMode() const {
+		return GESScene::NoneMode;
+	}
+
+	virtual void activate() {
+	}
+	virtual void deactivate() {
 	}
 
 	//! Событие нажатия кнопки

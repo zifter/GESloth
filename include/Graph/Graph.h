@@ -31,7 +31,6 @@
 #define GRAPH_H_
 
 #include <QList>
-#include "Macros.h"
 
 #include "Gui/GESScene.h"
 
@@ -39,30 +38,31 @@
 #include "Graph/Node.h"
 #include "Graph/Object.h"
 
+#include "Macros.h"
 
 class Graph {
 public:
 	Graph();
 	~Graph();
 
-	void setScene(GESScene* scn );
+	void setScene(GESScene* scn);
 
 	//! Add node in graph
-	void add( Node* nd) {
+	void add(Node* nd) {
 		mNodes << nd;
-		if( mScene != 0 )
-			mScene->add( nd );
+		if (mScene != 0 && mScene != nd->scene())
+			mScene->add(nd);
 	}
 
 	//! Add edge in graph
 	void add(Edge* dg) {
 		mEdges << dg;
-		if( mScene != 0 )
-			mScene->add( dg );
+		if (mScene != 0 && mScene != dg->scene())
+			mScene->add(dg);
 	}
 
 	//! Add another graph
-	void add( Graph* gr );
+	void add(Graph* gr);
 
 	//! Get list of all nodes in graph
 	QList<Node*> nodes() const {
@@ -75,24 +75,21 @@ public:
 	}
 
 	//! Remove edge
-	bool remove( Edge* ed ){
-		if( mScene != 0 )
-			mScene->removeItem( ed );
-		ed->del();
-		return mEdges.removeOne( ed );
-	}
+	bool remove(Edge* ed);
 
 	//! Remove node
-	bool remove( Node* node );
+	bool remove(Node* node);
 
 	//! Remove graph
-	bool remove( Graph* gr );
+	bool remove(Graph* gr);
 
 	//! Clean all graph
 	void removeAll();
 
 	//! Delete all edges, which doesn't have source and dest Node in this graph
 	void fixEdge();
+
+	static Graph* toGraph(QList<QGraphicsItem*>&);
 private:
 	//! Лист вершин
 	QList<Node*> mNodes;

@@ -25,7 +25,7 @@
 #include "Graph/Edge.h"
 #include "Graph/Node.h"
 
-#include <math.h>
+#include <qmath.h>
 
 Edge::Edge(Node *sourceNode, Node *destNode) :
 		arrowSize(10) {

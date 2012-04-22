@@ -88,6 +88,15 @@ bool Graph::remove(Node* node) {
 	return mNodes.removeOne(node);
 }
 
+//! Remove edge
+bool Graph::remove( Edge* ed ){
+	if( mScene != 0 )
+		mScene->removeItem( ed );
+	ed->del();
+	return mEdges.removeOne( ed );
+}
+
+
 bool Graph::remove(Graph* gr) {
 	foreach(Node* node, gr->nodes())
 	{
@@ -114,7 +123,19 @@ void Graph::fixEdge(){
 	foreach(Edge* edge, mEdges)
 	{
 		if (!mNodes.contains(edge->destNode()) || !mNodes.contains(edge->sourceNode())) {
-			remove(edge);
+			mEdges.removeOne(edge);
 		}
 	}
 }
+
+Graph* Graph::toGraph(QList<QGraphicsItem*>& itemList) {
+	Graph* retGraph = new Graph();
+	foreach(QGraphicsItem *item, itemList) {
+		if (item->type() == Node::Type)
+			retGraph->add(qgraphicsitem_cast<Node*>(item));
+		if (item->type() == Edge::Type)
+			retGraph->add(qgraphicsitem_cast<Edge*>(item));
+	}
+	return retGraph;
+}
+

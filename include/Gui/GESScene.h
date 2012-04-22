@@ -28,9 +28,8 @@
 #include <QMimeData>
 #include <QGraphicsView>
 #include <QUndoStack>
+#include <QUndoCommand>
 #include <QVector>
-
-#include "Gui/SceneEventHandler/AbstractSceneEventHandler.h"
 
 class GESloth;
 class Node;
@@ -49,6 +48,7 @@ class NodeModeEventHandler;
 class InstertModeEventHandler;
 class EdgeeModeEventHandler;
 class PageSettings;
+class AbstractSceneEventHandler;
 
 class GESScene: public QGraphicsScene {
 Q_OBJECT
@@ -72,29 +72,23 @@ public:
 		return mGraph;
 	}
 
+	EditMode getEditMode() const{
+		return mMode;
+	}
+
+	EditMode getPreviousEditMode() const{
+		return mPreviousMode;
+	}
+
 	void add( Edge* );
 	void add( Node* );
 
+	void addCommand( QUndoCommand* cmd ){
+		mStackCommand.push( cmd );
+	}
 	void renderToImage(QPainter *painter, const QRectF &target, const QRectF &source);
 
 public:
-	/**
-	 * @brief Create node in point
-	 * @param point Center point
-	 */
-
-	void createNode( const QPointF& point );
-	/**
-	 * @brief Draw line (look like point)
-	 * @param point point where now situated mouses pointer
-	 * @param newEdge if true - draw new line, else change previous line
-	 */
-	void pre_createEdge( const QPointF& point, bool newEdge );
-
-	/**
-	 * @brief Create edge from previous info about point
-	 */
-	void createEdge();
 
 	/**
 	 * @brief Create context menu which depend from items which situated under mouse
@@ -105,7 +99,7 @@ public:
 
 public slots:
 	//! Установка состояния
-	void setState(EditMode state);
+	void setEditMode(EditMode state);
 
 	//! Удалить
 	void deleteSelectedObj();
@@ -152,17 +146,13 @@ protected:
 	//! Событие вызова контекстного меню
 	void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-	Graph* toGraph(QList<QGraphicsItem*>& itemList);
-
 	//! Graph which contains on scene
 	Graph* mGraph;
 
 	EditMode mMode;
+	EditMode mPreviousMode;
 
-	QVector< AbstractSceneEventHandler* > hanlder;
-
-	//! Линия
-	QGraphicsLineItem* line;
+	QVector< AbstractSceneEventHandler* > mHandler;
 
 	//! Меню
 	QMenu* menu;
@@ -170,11 +160,8 @@ protected:
 	//! Текущий элемент
 	QGraphicsItem* currentItem;
 
-	//! Текущие объекты
-	QList<QGraphicsItem*> currentList;
-
 	//! Стек команд
-	QUndoStack stackCommand;
+	QUndoStack mStackCommand;
 
 };
 

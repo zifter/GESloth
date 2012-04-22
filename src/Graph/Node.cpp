@@ -186,6 +186,11 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	painter->setBrush(gradient);
 	painter->setPen(QPen(Qt::black, 0));
 	painter->drawEllipse(-10, -10, 20, 20);
+
+
+	//QRectF a(-20 - 2, -33 - 2, 50 + 2, 50 + 2);
+	//painter->drawRect(a);
+
 	if (isSelected()) {
 		painter->setPen(QPen(Qt::blue, 1, Qt::DotLine));
 		painter->setBrush(Qt::NoBrush);

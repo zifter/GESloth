@@ -58,7 +58,7 @@ void GESTabWidget::removePage(int index){
 void GESTabWidget::setSceneState( int st ){
 	GESPage* page = getCurrentPage();
 	if( getCurrentPage() != 0 )
-		page->getScene()->setState( (GESScene::EditMode) st );
+		page->getScene()->setEditMode( (GESScene::EditMode) st );
 }
 
 void GESTabWidget::setScale(const QString& sc ){

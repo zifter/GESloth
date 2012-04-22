@@ -31,20 +31,26 @@
 #define INSERTMODEEVENTHANDLER_H_
 
 #include "Gui/SceneEventHandler/AbstractSceneEventHandler.h"
+//class QGraphicsItemGroup;
 
 class InsertModeEventHandler : public AbstractSceneEventHandler {
 public:
 	explicit InsertModeEventHandler(  GESScene* sc );
 	~InsertModeEventHandler();
 
+	virtual void activate();
+	virtual void deactivate();
+
 	//! Событие нажатия кнопки
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 	//! Событие двежение зажатой мышки
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
+private:
+	Graph* mGraph;
 
-	//! Событие отпускание кнопки
-	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	//! Текущие объекты
+	QGraphicsItemGroup* mPastingGroup;
 };
 
 #endif /* INSERTMODEEVENTHANDLER_H_ */
