@@ -20,13 +20,21 @@
  **
  ****************************************************************************/
 
-#include "Graph/Object.h"
-#include "Graph/Graph.h"
+/*
+ * AbstractDrawNodeAlgorithm.cpp
+ *
+ *  Created on: Apr 22, 2012
+ *      Author: zifter
+ */
 
-Object::Object() : mGraph(0)
-{
+#include "Algorithm/AbstractDrawNodeAlgorithm.h"
+
+AbstractDrawNodeAlgorithm::AbstractDrawNodeAlgorithm() {
+	// TODO Auto-generated constructor stub
+
 }
 
-Object::~Object()
-{
+AbstractDrawNodeAlgorithm::~AbstractDrawNodeAlgorithm() {
+	// TODO Auto-generated destructor stub
 }
+

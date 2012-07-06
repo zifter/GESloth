@@ -26,25 +26,83 @@
  *  Created on: Apr 19, 2012
  *      Author: zifter
  */
+#include <QByteArray>
+#include <QApplication>
+#include <QClipboard>
 
 #include "Gui/SceneEventHandler/InsertModeEventHandler.h"
+#include "Gui/Command.h"
+#include "Gui/GESScene.h"
 #include "Macros.h"
 
-InsertModeEventHandler::InsertModeEventHandler( GESScene* sc ) : AbstractSceneEventHandler(sc) {
+#include "XML/GESFileLoader.h"
+
+InsertModeEventHandler::InsertModeEventHandler(GESScene* sc) :
+		AbstractSceneEventHandler(sc) {
 
 }
 
 InsertModeEventHandler::~InsertModeEventHandler() {
 }
 
-void InsertModeEventHandler::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent){
-	PRINT("")
+void InsertModeEventHandler::activate() {
+	if (!(QApplication::clipboard()->mimeData()->hasFormat("Graph Editor Sloth/items")))
+		return;
+	QByteArray bt;
+	bt = QApplication::clipboard()->mimeData()->data("Graph Editor Sloth/items");
+
+	GESFileLoader loader;
+	mGraph = new Graph();
+	if (!loader.loadFromByte(mGraph, bt))
+		loader.showError();
+
+	QList<QGraphicsItem*> objs;
+
+	foreach( QGraphicsItem* item, mGraph->edges() ) {
+		objs.append(item);
+	}
+
+	qreal x=mGraph->nodes().at(0)->pos().x();
+	qreal y=mGraph->nodes().at(0)->pos().y();
+
+	foreach( QGraphicsItem* item, mGraph->nodes() ) {
+		objs.append(item);
+		if( x > item->pos().x())
+			x = item->pos().x();
+		if( y > item->pos().y())
+					y = item->pos().y();
+	}
+	Node mappedItem(0);
+	mappedItem.setPos(x, y);
+
+	foreach( QGraphicsItem* item, mGraph->nodes() )
+		item->setPos( item->mapToItem( &mappedItem, 0,0 ) );
+
+	mPastingGroup = mScene->createItemGroup(objs);
+
+	QGraphicsView* v = mScene->views().at(0);
+	QPointF p = v->mapToScene(v->mapFromGlobal(QCursor::pos()));
+	mPastingGroup->setPos(p);
+
+	mPastingGroup->setOpacity(0.5);
 }
 
-void InsertModeEventHandler::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent){
-	PRINT("")
+void InsertModeEventHandler::deactivate() {
+	mScene->destroyItemGroup(mPastingGroup);
 }
 
-void InsertModeEventHandler::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent){
-	PRINT("")
+void InsertModeEventHandler::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	if( mouseEvent->button() == Qt::LeftButton )
+	{
+		addItemCommand* command = new addItemCommand(mGraph, mScene->getGraph() );
+		mScene->addCommand(command);
+	}
+	else
+		delete mGraph;
+	mScene->setEditMode(mScene->getPreviousEditMode());
+}
+
+void InsertModeEventHandler::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	if (mPastingGroup)
+		mPastingGroup->setPos(mouseEvent->scenePos());
 }

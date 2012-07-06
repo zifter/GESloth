@@ -25,10 +25,12 @@
 #include <QPainter>
 #include <QStyleOption>
 
+#include "Algorithm/SimpleDrawNodeAlgo.h"
 #include "Gui/GESloth.h"
 
 #include "Graph/Edge.h"
 #include "Graph/Node.h"
+#include "Graph/Graph.h"
 
 #include "Macros.h"
 
@@ -76,14 +78,10 @@ void Node::del() {
 	foreach(Edge* edge, InEdges())
 	{
 		edge->del();
-		//InEdgeList.removeOne(edge);
-//		graph->delItem(edge);
 	}
 	foreach(Edge* edge, OutEdges())
 	{
 		edge->del();
-		//OutEdgeList.removeOne(edge);
-//		graph->delItem(edge);
 	}
 }
 
@@ -118,8 +116,8 @@ void Node::calculateForces() {
 	QPointF tmpPos;
 	foreach (Edge *edge, InEdgeList)
 	{
-		if( edge->length() < 40 )
-			continue;
+		//if( edge->length() < 40 )
+		//	continue;
 		if (edge->sourceNode() == this)
 			tmpPos = mapFromItem(edge->destNode(), 0, 0);
 		else
@@ -130,8 +128,8 @@ void Node::calculateForces() {
 
 	foreach (Edge *edge, OutEdgeList)
 	{
-		if( edge->length() < 40 )
-					continue;
+		//if( edge->length() < 40 )
+		//			continue;
 		if (edge->sourceNode() == this)
 			tmpPos = mapFromItem(edge->destNode(), 0, 0);
 		else
@@ -162,45 +160,22 @@ bool Node::advance() {
 }
 
 QRectF Node::boundingRect() const {
-	qreal adjust = 2;
-	return QRectF(-20 - adjust, -33 - adjust, 100 + adjust, 70 + adjust);
+	if( !mGraph )
+		return QRectF();
+	return mGraph->algoNode()->boundingRect(this);
 }
 
 QPainterPath Node::shape() const {
-	QPainterPath path;
-	path.addEllipse(-10, -10, 20, 20);
-	return path;
+	if( !mGraph )
+		return QPainterPath();
+	return mGraph->algoNode()->shape(this);
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-		QWidget *) {
-	painter->setPen(Qt::NoPen);
-	QRadialGradient gradient(-10, 0, 20);
-	if (option->state & QStyle::State_Sunken) {
-		gradient.setColorAt(1, QColor(Qt::white).light(120));
-		gradient.setColorAt(0, QColor(Qt::gray).light(120));
-	} else {
-		gradient.setColorAt(0, Qt::gray);
-		gradient.setColorAt(1, Qt::white);
-	}
-	painter->setBrush(gradient);
-	painter->setPen(QPen(Qt::black, 0));
-	painter->drawEllipse(-10, -10, 20, 20);
-	if (isSelected()) {
-		painter->setPen(QPen(Qt::blue, 1, Qt::DotLine));
-		painter->setBrush(Qt::NoBrush);
-		painter->drawEllipse(-12, -12, 24, 24);
-		painter->setPen(QPen(Qt::blue, 1, Qt::SolidLine));
-		painter->drawEllipse(-1, -1, 1, 1);
-	}
-	qreal adj = 0;
-	if (getShortText().size() < 5)
-		adj = 10;
-	else
-		adj = 0;
-	painter->setPen(Qt::red);
-	painter->setFont(QFont("Arial", 7));
-	painter->drawText(QPointF(-20 + adj, 20), getShortText());
+		QWidget *wid) {
+
+	if( mGraph )
+		mGraph->algoNode()->paint(this, painter, option, wid);
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value) {

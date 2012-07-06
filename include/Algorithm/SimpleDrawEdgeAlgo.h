@@ -20,13 +20,37 @@
  **
  ****************************************************************************/
 
-#include "Graph/Object.h"
-#include "Graph/Graph.h"
+/*
+ * SimpleDrawEdgeAlgo.h
+ *
+ *  Created on: Apr 22, 2012
+ *      Author: zifter
+ */
 
-Object::Object() : mGraph(0)
-{
-}
+#ifndef SIMPLEDRAWEDGEALGO_H_
+#define SIMPLEDRAWEDGEALGO_H_
 
-Object::~Object()
-{
-}
+#include "AbstractDrawEdgeAlgorithm.h"
+
+class SimpleDrawEdgeAlgo: public AbstractDrawEdgeAlgorithm {
+public:
+	SimpleDrawEdgeAlgo();
+	virtual ~SimpleDrawEdgeAlgo();
+
+	//! Перегруз области прорисовки
+	virtual QRectF boundingRect( const Edge* edge  ) const  ;
+
+	//! Перегрузка прорисовки
+	virtual void paint( const Edge*, QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) ;
+
+	//! Определение формы объекта
+	virtual QPainterPath shape( const  Edge* edge  ) const  ;
+private:
+    //! Размер стрелки
+    qreal mArrowSize;
+
+	qreal mPenWidth;
+	qreal mExtra;
+};
+
+#endif /* SIMPLEDRAWEDGEALGO_H_ */

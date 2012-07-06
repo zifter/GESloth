@@ -37,6 +37,9 @@ public:
 	explicit EdgeModeEventHanlder( GESScene* sc );
 	~EdgeModeEventHanlder();
 
+	virtual void activate();
+	virtual void deactivate();
+
 	//! Событие нажатия кнопки
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
@@ -48,6 +51,10 @@ public:
 
 	//! Событие вызова контекстного меню
 	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+private:
+
+	//! Линия
+	QGraphicsLineItem* mLine;
 
 };
 

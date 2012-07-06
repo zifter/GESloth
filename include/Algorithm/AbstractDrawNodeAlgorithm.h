@@ -20,13 +20,36 @@
  **
  ****************************************************************************/
 
-#include "Graph/Object.h"
-#include "Graph/Graph.h"
+/*
+ * AbstractDrawNodeAlgorithm.h
+ *
+ *  Created on: Apr 22, 2012
+ *      Author: zifter
+ */
 
-Object::Object() : mGraph(0)
-{
-}
+#ifndef ABSTRACTDRAWNODEALGORITHM_H_
+#define ABSTRACTDRAWNODEALGORITHM_H_
 
-Object::~Object()
-{
-}
+#include <QPainter>
+#include <QPainterPath>
+#include <QStyleOptionGraphicsItem>
+#include <QWidget>
+
+#include "Graph/Node.h"
+
+class AbstractDrawNodeAlgorithm {
+public:
+	AbstractDrawNodeAlgorithm();
+	virtual ~AbstractDrawNodeAlgorithm();
+
+	//! Перегруз области прорисовки
+	virtual QRectF boundingRect(const Node* node ) const = 0 ;
+
+	//! Перегрузка прорисовки
+	virtual void paint( const Node*, QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)  = 0 ;
+
+	//! Определение формы объекта
+	virtual QPainterPath shape( const Node* node ) const  = 0 ;
+};
+
+#endif /* ABSTRACTDRAWNODEALGORITHM_H_ */

@@ -29,20 +29,41 @@
 
 #include "Gui/SceneEventHandler/NodeModeEventHandler.h"
 #include "Gui/GESScene.h"
+#include "Gui/Command.h"
+#include "Graph/Node.h"
+
 #include "Macros.h"
 
-NodeModeEventHandler::NodeModeEventHandler( GESScene* sc ) : AbstractSceneEventHandler(sc) {
+NodeModeEventHandler::NodeModeEventHandler(GESScene* sc) :
+		AbstractSceneEventHandler(sc) {
 
 }
 
 NodeModeEventHandler::~NodeModeEventHandler() {
 }
 
-void NodeModeEventHandler::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent){
-	if (mouseEvent->button() == Qt::LeftButton )
-		mScene->createNode( mouseEvent->scenePos() );
+void NodeModeEventHandler::activate() {
+
 }
 
-void NodeModeEventHandler::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
-	mScene->createContextMenu( event->scenePos(), event->screenPos() );
+void NodeModeEventHandler::deactivate() {
+
+}
+
+void NodeModeEventHandler::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent) {
+	if (mouseEvent->button() != Qt::LeftButton)
+		return;
+
+	Node *node = new Node(0);
+	node->setPos(mouseEvent->scenePos());
+	node->setFlag(QGraphicsItem::ItemIsMovable, true);
+
+	QList<QGraphicsItem*> a;
+	a << node;
+	addItemCommand* command = new addItemCommand(Graph::toGraph(a), mScene->getGraph() );
+	mScene->addCommand(command);
+}
+
+void NodeModeEventHandler::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+	mScene->createContextMenu(event->scenePos(), event->screenPos());
 }

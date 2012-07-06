@@ -27,6 +27,7 @@
 #include "Graph/Object.h"
 
 class Node;
+class Graph;
 
 class Edge : public  Object
 {
@@ -45,14 +46,19 @@ public:
     //! Установить конец ребра
     void setDestNode(Node *node);
 
+    QPointF sourcePoint() const {
+    	return srcPoint;
+    }
+
+    QPointF destPoint() const {
+    	return dstPoint;
+    }
+
     //! Регулировка ребра
     void adjust();
 
     //! Удалить ребро
     void del();
-
-    //! Returns length of edge
-    qreal length();
 
     //! Проверить ребро на то, что src и dst являеються иточником и концом ребра
     bool checkEdge(Node* src, Node* dst);
@@ -62,7 +68,7 @@ public:
 
     //! Вернуть тип
     int type() const { return Type; }
-    
+
 protected:
     //! Перегруз области прорисовки
     QRectF boundingRect() const;
@@ -78,10 +84,10 @@ private:
     Node* source,* dest;
 
     //! Точка исходной вершины
-    QPointF sourcePoint;
+    QPointF srcPoint;
 
     //! Точка концевой вершины
-    QPointF destPoint;
+    QPointF dstPoint;
 
     //! Размер стрелки
     qreal arrowSize;

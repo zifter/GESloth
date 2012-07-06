@@ -38,6 +38,9 @@ public:
 	explicit NodeModeEventHandler( GESScene* sc );
 	~NodeModeEventHandler();
 
+	virtual void activate();
+	virtual void deactivate();
+
 	//! Событие двойного щелчка
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
 

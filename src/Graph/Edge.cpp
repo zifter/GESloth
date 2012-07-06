@@ -21,11 +21,12 @@
  ****************************************************************************/
 
 #include <QPainter>
+#include <qmath.h>
 
 #include "Graph/Edge.h"
 #include "Graph/Node.h"
-
-#include <math.h>
+#include "Graph/Graph.h"
+#include "Algorithm/AbstractDrawEdgeAlgorithm.h"
 
 Edge::Edge(Node *sourceNode, Node *destNode) :
 		arrowSize(10) {
@@ -74,100 +75,32 @@ void Edge::adjust() {
 	if (length > qreal(24.)) {
 		QPointF edgeOffset((line.dx() * 10) / length,
 				(line.dy() * 10) / length);
-		sourcePoint = line.p1() + edgeOffset;
-		destPoint = line.p2() - edgeOffset;
+		srcPoint = line.p1() + edgeOffset;
+		dstPoint = line.p2() - edgeOffset;
 	} else {
-		sourcePoint = destPoint = line.p1();
+		srcPoint = dstPoint = line.p1();
 	}
 }
 
 QRectF Edge::boundingRect() const {
-	if (!source || !dest)
+	PRINT("")
+	if( !mGraph )
 		return QRectF();
-
-	qreal penWidth = 1;
-	qreal extra = (penWidth + arrowSize) / 1.0;
-
-	return QRectF(
-			sourcePoint,
-			QSizeF(destPoint.x() - sourcePoint.x(),
-					destPoint.y() - sourcePoint.y())).normalized().adjusted(
-			-extra, -extra, extra, extra);
+	return mGraph->algoEdge()->boundingRect(this);
 }
 
-void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *,
-		QWidget *) {
-	setZValue(-10);
-	if (!source || !dest)
+void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem * op,
+		QWidget *wid) {
+	PRINT("")
+	if( !mGraph )
 		return;
-
-	QLineF line(sourcePoint, destPoint);
-	if (qFuzzyCompare(line.length(), qreal(0.)))
-		return;
-
-	QColor myColor(Qt::black);
-	QVector<QPoint> vect;
-	vect.push_back(QPoint(sourcePoint.x(), sourcePoint.y()));
-	vect.push_back(QPoint(destPoint.x(), destPoint.y()));
-	if (isSelected())
-		myColor = QColor(Qt::blue);
-
-	// Draw the line itself
-	painter->setPen(
-			QPen(myColor, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-	painter->drawLine(line);
-
-	// Draw the arrows
-	double angle = ::acos(line.dx() / line.length());
-	if (line.dy() >= 0)
-		angle = 2 * M_PI - angle;
-
-	QPointF destArrowP1 = destPoint
-			+ QPointF(sin(angle - M_PI / 3) * arrowSize,
-					cos(angle - M_PI / 3) * arrowSize);
-	QPointF destArrowP2 = destPoint
-			+ QPointF(sin(angle - M_PI + M_PI / 3) * arrowSize,
-					cos(angle - M_PI + M_PI / 3) * arrowSize);
-
-	painter->setBrush(myColor);
-	painter->drawPolygon(
-			QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
-	painter->setPen(Qt::red);
-	painter->setFont(QFont("Arial", 7));
-	painter->drawText(
-			QPointF(destPoint.x() + (sourcePoint.x() - destPoint.x()) / 2,
-					destPoint.y() + (sourcePoint.y() - destPoint.y()) / 2),
-			getShortText());
+	mGraph->algoEdge()->paint(this, painter, op, wid);
 }
 
 QPainterPath Edge::shape() const {
-	QPainterPath path;
-
-	QLineF line(sourcePoint, destPoint);
-	double angle = ::acos(line.dx() / line.length());
-	if (line.dy() >= 0)
-		angle = 2 * M_PI - angle;
-
-	QPointF destArrowP1 = destPoint
-			+ QPointF(sin(angle - M_PI / 3) * arrowSize,
-					cos(angle - M_PI / 3) * arrowSize);
-	QPointF destArrowP2 = destPoint
-			+ QPointF(sin(angle - M_PI + M_PI / 3) * arrowSize,
-					cos(angle - M_PI + M_PI / 3) * arrowSize);
-
-	path.addPolygon(
-			QPolygonF()
-					<< QPoint((destArrowP1.x() + destArrowP2.x()) / 2,
-							(destArrowP1.y() + destArrowP2.y()) / 2)
-					<< destArrowP1 << destArrowP2);
-
-	QPolygonF pol;
-	pol << QPoint(sourcePoint.x() - 2, sourcePoint.y() - 2)
-			<< QPoint(sourcePoint.x() + 2, sourcePoint.y() + 2)
-			<< QPoint(destPoint.x() - 2, destPoint.y() - 2)
-			<< QPoint(destPoint.x() + 2, destPoint.y() + 2);
-	path.addPolygon(pol);
-	return path;
+	if( !mGraph )
+		return QPainterPath();
+	return mGraph->algoEdge()->shape(this);
 }
 
 void Edge::del() {
@@ -180,12 +113,4 @@ bool Edge::checkEdge(Node* src, Node* dst) {
 		return true;
 	else
 		return false;
-}
-
-qreal Edge::length() {
-	return sqrt(
-			(destPoint.x() - sourcePoint.x())
-					* (destPoint.x() - sourcePoint.x())
-					+ (destPoint.y() - sourcePoint.y())
-							* (destPoint.y() - sourcePoint.y()));
 }

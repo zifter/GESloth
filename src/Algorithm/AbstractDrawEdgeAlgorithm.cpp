@@ -22,19 +22,20 @@
 
 
 /*
- * AbstractAlgorithm.h
+ * AbstractDrawEdgeAlgorithm.cpp
  *
- *  Created on: Apr 18, 2012
+ *  Created on: Apr 22, 2012
  *      Author: zifter
  */
 
-#ifndef ABSTRACTALGORITHM_H_
-#define ABSTRACTALGORITHM_H_
+#include "Algorithm/AbstractDrawEdgeAlgorithm.h"
 
-class AbstractAlgorithm {
-public:
-	AbstractAlgorithm();
-	~AbstractAlgorithm();
-};
+AbstractDrawEdgeAlgorithm::AbstractDrawEdgeAlgorithm() {
+	// TODO Auto-generated constructor stub
 
-#endif /* ABSTRACTALGORITHM_H_ */
+}
+
+AbstractDrawEdgeAlgorithm::~AbstractDrawEdgeAlgorithm() {
+	// TODO Auto-generated destructor stub
+}
+
