@@ -20,6 +20,13 @@
  **
  ****************************************************************************/
 
+/*
+ * GESView.cpp
+ *
+ *  Created on: Apr 15, 2012
+ *      Author: zifter
+ */
+
 #include <QtGui>
 
 #include "Gui/GESloth.h"
